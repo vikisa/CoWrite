@@ -1,7 +1,6 @@
 import ElementPlus from 'element-plus';
-
-import 'element-plus/dist/index.css';
 import ru from 'element-plus/dist/locale/ru.mjs'
+import '@/assets/element-variables.scss';
 
 export default {
   install: (app) => {

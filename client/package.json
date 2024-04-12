@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "@tiptap/extension-document": "^2.3.0",
     "@tiptap/extension-paragraph": "^2.3.0",
     "@tiptap/extension-text": "^2.3.0",
@@ -35,6 +36,7 @@
     "eslint-plugin-vue": "^9.17.0",
     "npm-run-all2": "^6.1.2",
     "prettier": "^3.0.3",
+    "sass": "^1.75.0",
     "typescript": "~5.4.0",
     "vite": "^5.1.6",
     "vue-tsc": "^2.0.6"

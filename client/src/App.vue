@@ -1,85 +1,61 @@
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <el-container class="main-container">
+    <el-aside v-if="isAuthenticated">
+      <el-menu
+          class="menu"
+          :router="false"
+          :collapse="isCollapse"
+          :default-active="activeLink"
+          @select="handleSelectItem"
+      >
+        <el-menu-item index="list">
+          <el-icon><Memo /></el-icon>
+          <template #title>List</template>
+        </el-menu-item>
+        <el-menu-item index="toggle-menu" @click="isCollapse = !isCollapse">
+          <i :class="['fa-solid', {'fa-arrow-right': isCollapse, 'fa-arrow-left': !isCollapse}]"></i>
+        </el-menu-item>
+        <el-menu-item index="logout">
+          <i class="fa-solid fa-power-off"></i>
+          <span slot="title">Выход</span>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
+    <el-main>
+      <router-view />
+    </el-main>
+  </el-container>
 </template>
 
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+<script setup>
+import {ref, shallowRef} from 'vue'
+
+const isCollapse = ref(true)
+const activeLink = shallowRef('')
+const isAuthenticated = ref(true);
+
+const handleSelectItem = (item) => {
+  console.log('item',item)
+}
 </script>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+<style lang="scss" scoped>
+.main-container, .el-aside, .menu {
+  min-height: 100vh;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.el-aside {
+  width: unset;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+.el-menu-item {
+  gap: 10px;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
+.el-menu--collapse {
+  .el-menu-item {
+    justify-content: center;
+    gap: 0;
   }
 }
 </style>
