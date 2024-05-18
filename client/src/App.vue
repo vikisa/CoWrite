@@ -8,6 +8,18 @@
           :default-active="activeLink"
           @select="handleSelectItem"
       >
+        <el-menu-item index="/new">
+          <RouterLink to="/new">
+            <el-icon><Memo /></el-icon>
+            <template #title>List</template>
+          </RouterLink>
+        </el-menu-item>
+        <el-menu-item index="/">
+          <RouterLink to="/">
+            <el-icon><Memo /></el-icon>
+            <template #title>List</template>
+          </RouterLink>
+        </el-menu-item>
         <el-menu-item index="toggle-menu" @click="isCollapse = !isCollapse">
           <i :class="['fa-solid', {'fa-arrow-right': isCollapse, 'fa-arrow-left': !isCollapse}]"></i>
         </el-menu-item>
