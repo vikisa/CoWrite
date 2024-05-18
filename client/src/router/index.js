@@ -1,8 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { store } from '@/store';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/Login.vue'),
+      meta: {
+        notRequiresAuth: true,
+        title: 'Вход',
+      },
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/views/Register.vue'),
+      meta: {
+        notRequiresAuth: true,
+        title: 'Регистрация',
+      },
+    },
+
     {
       path: '/',
       name: 'list',
@@ -15,5 +35,18 @@ const router = createRouter({
     }
   ]
 })
+
+router.beforeEach(async (to, from, next) => {
+  const isAuthenticated = store.getters.isAuthenticated;
+
+  // роутинг с предварительной проверкой прав
+  if (to.matched.some((record) => record.meta.notRequiresAuth)) {
+    next();
+  } else if (isAuthenticated) {
+    next();
+  } else {
+    next({ name: 'login' });
+  }
+});
 
 export default router
