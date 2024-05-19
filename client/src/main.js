@@ -18,4 +18,7 @@ app.use(Element);
 import router from './router'
 app.use(router)
 
+import dayjs from './plugins/day.js';
+app.use(dayjs);
+
 app.mount('#app')

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Res, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, Param, UnauthorizedException, ParseIntPipe } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { FilterAuthDto } from "./dto/filter-auth.dto";
@@ -38,18 +38,14 @@ export class AuthController {
     @Body('password') password: string,
     @Res({ passthrough: true }) response: Response
   ) {
-    response.cookie('jwt', await this.authService.login(username, password), { httpOnly: true });
-
-    return {
-      message: 'success'
-    };
+    return await this.authService.login(username, password);
   }
 
-  @Get('user')
-  async user(@Req() request: Request) {
+  @Post('user')
+  async user(@Body('token') token: string) {
+    console.log('token',token)
     try {
-      const cookie = request.cookies['jwt'];
-      const data = await this.jwtService.verifyAsync(cookie);
+      const data = await this.jwtService.verifyAsync(token);
 
       if (!data) {
         throw new UnauthorizedException('User not authorized 111');
@@ -62,17 +58,6 @@ export class AuthController {
     }
     catch (e) {
       throw new UnauthorizedException('User not authorized');
-    }
-  }
-
-  @Post('logout')
-  async logout(
-    @Res({ passthrough: true }) response: Response
-  ) {
-    response.clearCookie('jwt');
-
-    return {
-      message: 'success'
     }
   }
 

@@ -45,17 +45,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getUserData']),
+    ...mapActions(['login','getUserData']),
     async submit() {
       const data = { username: this.username, password: this.password };
-      await fetch('http://localhost:8000/api/auth/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify(data)
-      });
-
-      await this.getUserData();
+      await this.login(data);
     }
   }
 }

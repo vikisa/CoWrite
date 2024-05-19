@@ -1,12 +1,15 @@
 import { createStore } from 'vuex'
-//import auth from './modules/auth';
+import auth from './modules/auth';
 import user from './modules/user';
+import notification from './modules/notification';
 export const store = createStore({
   state: {},
   mutations: {},
   actions: {},
   modules: {
-    user
+    user,
+    auth,
+    notification
   }
 });
 

@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from "../../entities/Users.entity";
 import { UserRoles } from "../../entities/UserRoles.entity";
 import * as bcrypt from 'bcrypt';
-import { JwtService } from "@nestjs/jwt";
+import { JwtService, JwtSignOptions } from "@nestjs/jwt";
+import { ConfigService } from '@nestjs/config';
 import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
 @Injectable()
 export class AuthService {
@@ -13,7 +14,8 @@ export class AuthService {
     private readonly userRepository: Repository<Users>,
     @InjectRepository(UserRoles)
     private readonly userRolesRepository: Repository<UserRoles>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private configService: ConfigService
   ) {}
 
   async register(data: any): Promise<Users> {
@@ -42,7 +44,12 @@ export class AuthService {
       throw new UnauthorizedException('User not authorized');
     }
 
-    return await this.jwtService.signAsync({ id: user.id });
+    const tokenData = {
+      userId: user.id,
+      userLogin: user.username
+    };
+
+    return this.jwtService.sign(tokenData);
   }
 
   async findOne(condition: any) {
