@@ -3,6 +3,7 @@ const state = {
 };
 
 const getters = {
+  userFullName: (state) => `${state.userData.firstname} ${state.userData.lastname}`
 };
 
 const actions = {
@@ -26,6 +27,7 @@ const actions = {
 const mutations = {
   updateUser(state, val) {
     state.userData = val;
+    console.log('state.userData',state.userData)
   },
 };
 

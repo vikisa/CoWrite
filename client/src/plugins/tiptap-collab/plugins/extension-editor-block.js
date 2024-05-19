@@ -30,7 +30,6 @@ export default Node.create({
           .selectParentNode()
           .createParagraphNear()
           .run();
-
       },
     }
   },
