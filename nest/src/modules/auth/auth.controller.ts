@@ -43,12 +43,11 @@ export class AuthController {
 
   @Post('user')
   async user(@Body('token') token: string) {
-    console.log('token',token)
     try {
       const data = await this.jwtService.verifyAsync(token);
 
       if (!data) {
-        throw new UnauthorizedException('User not authorized 111');
+        throw new UnauthorizedException('User not authorized');
       }
 
       const user = await this.authService.findOne({ id: data['id'] });

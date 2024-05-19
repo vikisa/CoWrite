@@ -1,5 +1,3 @@
-import router from '@/router';
-
 const state = {
   userData: null,
 };
@@ -18,7 +16,6 @@ const actions = {
 
     if (response.ok) {
       commit('updateUser', await response.json());
-      await router.push('/');
     } else {
       localStorage.removeItem('user-token');
       console.error(response.status);

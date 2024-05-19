@@ -15,7 +15,7 @@
 
         <el-menu-item index="/material/new">
           <i class="fa-solid fa-plus"></i>
-          <span slot="title">Добавить документ</span>
+          <span slot="title">Добавить материал</span>
         </el-menu-item>
 
         <el-menu-item index="/list">
@@ -77,6 +77,9 @@ const handleSelectItem = async (item) => {
 onMounted(async () => {
   if (userToken.value)
     await store.dispatch('getUserData', userToken.value);
+
+  await router.isReady();
+  activeLink.value = route.path;
 })
 </script>
 
