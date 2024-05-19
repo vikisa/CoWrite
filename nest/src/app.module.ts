@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import configuration from './config/configuration';
+//import configuration from './config/configuration';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Users} from "./entities/Users.entity";
 import {UserRoles} from "./entities/UserRoles.entity";
@@ -8,7 +8,7 @@ import {AuthModule} from './modules/auth/auth.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [configuration],
+      load: [],
       isGlobal: true,
       cache: true,
     }),
