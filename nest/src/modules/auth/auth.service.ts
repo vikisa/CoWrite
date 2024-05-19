@@ -6,7 +6,7 @@ import { UserRoles } from "../../entities/UserRoles.entity";
 import * as bcrypt from 'bcrypt';
 import { JwtService, JwtSignOptions } from "@nestjs/jwt";
 import { ConfigService } from '@nestjs/config';
-import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -14,8 +14,8 @@ export class AuthService {
     private readonly userRepository: Repository<Users>,
     @InjectRepository(UserRoles)
     private readonly userRolesRepository: Repository<UserRoles>,
-    private jwtService: JwtService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private jwtService: JwtService
   ) {}
 
   async register(data: any): Promise<Users> {

@@ -8,21 +8,25 @@
           :default-active="activeLink"
           @select="handleSelectItem"
       >
-        <el-menu-item index="/new">
-          <RouterLink to="/new">
-            <el-icon><Memo /></el-icon>
-            <template #title>List</template>
-          </RouterLink>
+        <el-menu-item index="/material/try">
+          <i class="fa-solid fa-bolt"></i>
+          <span slot="title">try</span>
         </el-menu-item>
-        <el-menu-item index="/">
-          <RouterLink to="/">
-            <el-icon><Memo /></el-icon>
-            <template #title>List</template>
-          </RouterLink>
+
+        <el-menu-item index="/material/new">
+          <i class="fa-solid fa-plus"></i>
+          <span slot="title">Добавить документ</span>
         </el-menu-item>
-        <el-menu-item index="toggle-menu" @click="isCollapse = !isCollapse">
-          <i :class="['fa-solid', {'fa-arrow-right': isCollapse, 'fa-arrow-left': !isCollapse}]"></i>
+
+        <el-menu-item index="/list">
+          <i class="fa-solid fa-list"></i>
+          <span slot="title">Список</span>
         </el-menu-item>
+
+        <li class="el-menu-item" tabindex="-1" @click="isCollapse = !isCollapse">
+          <i :class="['fa-solid', {'fa-arrow-right': isCollapse, 'fa-arrow-left': !isCollapse}]" aria-hidden="true"/>
+        </li>
+
         <el-menu-item index="logout">
           <i class="fa-solid fa-power-off"></i>
           <span slot="title">Выход</span>
@@ -36,7 +40,7 @@
       </el-header>
 
       <el-main>
-        <el-row justify="center">
+        <el-row justify="center" style="height: 100%">
           <el-col :span="22">
             <router-view />
           </el-col>
@@ -61,13 +65,13 @@ const isAuthenticated = computed(() => store.getters.isAuthenticated);
 const userToken = computed(() => store.getters.token);
 
 const handleSelectItem = async (item) => {
-  if (item === 'toggle')
-      return;
-
-  if (item === 'logout')
+  if (item === 'logout') {
     await store.dispatch('logout');
+    return;
+  }
 
-  await router.push({ name: item });
+  await router.push({ path: item });
+  activeLink.value = item;
 }
 
 onMounted(async () => {
