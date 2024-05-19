@@ -8,7 +8,11 @@ const getters = {
 
 const actions = {};
 
-const mutations = {};
+const mutations = {
+  setAuth(state, val) {
+    state.isAuthenticated = val;
+  }
+};
 
 export default {
   state,

@@ -14,12 +14,12 @@ export class AuthController {
     private jwtService: JwtService
   ) {}
 
-  @Post('registration')
-  async registration(@Body() filterAuthDto: FilterAuthDto) {
+  @Post('register')
+  async register(@Body() filterAuthDto: FilterAuthDto) {
     const { username, password, email, firstname, lastname, role } = filterAuthDto;
     const hashedPassword = await bcrypt.hash(password, 5);
 
-    const user = await this.authService.registration({
+    const user = await this.authService.register({
       username,
       password: hashedPassword,
       email,
@@ -74,5 +74,10 @@ export class AuthController {
     return {
       message: 'success'
     }
+  }
+
+  @Get('roles')
+  async roles() {
+    return await this.authService.getRoles();
   }
 }
