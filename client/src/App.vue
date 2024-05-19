@@ -37,6 +37,7 @@ const store = useStore();
 const isCollapse = ref(true)
 const activeLink = shallowRef('')
 const isAuthenticated = computed(() => store.getters.isAuthenticated);
+const userToken = computed(() => store.getters.token);
 
 const handleSelectItem = async (item) => {
   if (item === 'logout')
@@ -44,7 +45,8 @@ const handleSelectItem = async (item) => {
 }
 
 onMounted(async () => {
-  await store.dispatch('getUserData');
+  if (userToken.value)
+    await store.dispatch('getUserData', userToken.value);
 })
 </script>
 

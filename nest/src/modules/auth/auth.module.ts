@@ -12,7 +12,7 @@ import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, ConfigService],
   imports: [
     ConfigModule,
     TypeOrmModule.forFeature([
@@ -30,6 +30,6 @@ import { JwtModule } from "@nestjs/jwt";
       }),
     })
   ],
-  exports: [AuthService],
+  exports: [AuthService, ConfigService],
 })
 export class AuthModule {}
