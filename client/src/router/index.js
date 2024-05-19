@@ -29,17 +29,28 @@ const router = createRouter({
       component: () => import('@/views/List.vue')
     },
     {
+      path: '/list',
+      name: 'list',
+      component: () => import('@/views/List.vue')
+    },
+    {
       path: '/material',
       name: 'material',
-      component: () => import('@/views/material/Index.vue')
-    }
+      component: () => import('@/views/material/Index.vue'),
+      children: [
+        {
+          path: 'new',
+          name: 'new-material',
+          component: () => import('@/views/material/Index.vue'),
+        },
+      ]
+    },
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
   const isAuthenticated = store.getters.isAuthenticated;
 
-  // роутинг с предварительной проверкой прав
   if (to.matched.some((record) => record.meta.notRequiresAuth)) {
     next();
   } else if (isAuthenticated) {

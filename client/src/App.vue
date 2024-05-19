@@ -31,10 +31,16 @@
     </el-aside>
 
     <el-container>
-      <Header v-if="isAuthenticated"/>
+      <el-header v-if="isAuthenticated">
+        <Header/>
+      </el-header>
 
-      <el-main :class="{ 'login': !isAuthenticated }">
-        <router-view />
+      <el-main>
+        <el-row justify="center">
+          <el-col :span="22">
+            <router-view />
+          </el-col>
+        </el-row>
       </el-main>
     </el-container>
   </el-container>
@@ -45,6 +51,9 @@ import {ref, shallowRef, computed, onMounted} from 'vue'
 import Header from '@/views/components/Header.vue'
 import { useStore } from 'vuex';
 const store = useStore();
+import { useRouter, useRoute } from 'vue-router'
+const router = useRouter();
+const route = useRoute();
 
 const isCollapse = ref(true)
 const activeLink = shallowRef('')
@@ -52,8 +61,13 @@ const isAuthenticated = computed(() => store.getters.isAuthenticated);
 const userToken = computed(() => store.getters.token);
 
 const handleSelectItem = async (item) => {
+  if (item === 'toggle')
+      return;
+
   if (item === 'logout')
     await store.dispatch('logout');
+
+  await router.push({ name: item });
 }
 
 onMounted(async () => {
@@ -68,7 +82,7 @@ onMounted(async () => {
 }
 
 .el-main {
-  padding-top: 80px;
+  //padding-top: 80px;
 
   &.login {
     padding-top: unset;
@@ -88,5 +102,9 @@ onMounted(async () => {
     justify-content: center;
     gap: 0;
   }
+}
+
+.el-header {
+  padding: 0;
 }
 </style>

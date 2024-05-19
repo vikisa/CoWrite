@@ -15,9 +15,7 @@ app.use(store);
 import Element from './plugins/element-plus';
 app.use(Element);
 
-//import { createRouter } from './router';
-import { router } from './router';
-//export const router = createRouter(app);
+import router from './router';
 app.use(router)
 
 import dayjs from './plugins/day.js';
