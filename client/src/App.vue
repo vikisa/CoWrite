@@ -8,10 +8,6 @@
           :default-active="activeLink"
           @select="handleSelectItem"
       >
-        <el-menu-item index="list">
-          <el-icon><Memo /></el-icon>
-          <template #title>List</template>
-        </el-menu-item>
         <el-menu-item index="toggle-menu" @click="isCollapse = !isCollapse">
           <i :class="['fa-solid', {'fa-arrow-right': isCollapse, 'fa-arrow-left': !isCollapse}]"></i>
         </el-menu-item>
@@ -21,27 +17,48 @@
         </el-menu-item>
       </el-menu>
     </el-aside>
-    <el-main>
-      <router-view />
-    </el-main>
+
+    <el-container>
+      <Header v-if="isAuthenticated"/>
+
+      <el-main :class="{ 'login': !isAuthenticated }">
+        <router-view />
+      </el-main>
+    </el-container>
   </el-container>
 </template>
 
 <script setup>
-import {ref, shallowRef} from 'vue'
+import {ref, shallowRef, computed, onMounted} from 'vue'
+import Header from '@/views/components/Header.vue'
+import { useStore } from 'vuex';
+const store = useStore();
 
 const isCollapse = ref(true)
 const activeLink = shallowRef('')
-const isAuthenticated = ref(true);
+const isAuthenticated = computed(() => store.getters.isAuthenticated);
 
-const handleSelectItem = (item) => {
-  console.log('item',item)
+const handleSelectItem = async (item) => {
+  if (item === 'logout')
+    await store.dispatch('logout');
 }
+
+onMounted(async () => {
+  await store.dispatch('getUserData');
+})
 </script>
 
 <style lang="scss" scoped>
 .main-container, .el-aside, .menu {
   min-height: 100vh;
+}
+
+.el-main {
+  padding-top: 80px;
+
+  &.login {
+    padding-top: unset;
+  }
 }
 
 .el-aside {
