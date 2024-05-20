@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 import auth from './modules/auth';
 import user from './modules/user';
 import notification from './modules/notification';
+import material from './modules/material';
 export const store = createStore({
   state: {},
   mutations: {},
@@ -9,7 +10,8 @@ export const store = createStore({
   modules: {
     user,
     auth,
-    notification
+    notification,
+    material
   }
 });
 

@@ -46,7 +46,7 @@ const router = createRouter({
         {
           path: 'try',
           name: 'try',
-          component: () => import('@/views/material/Try2.vue'),
+          component: () => import('@/views/material/IndexCollab.vue'),
         }
       ]
     },

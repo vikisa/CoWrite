@@ -1,5 +1,6 @@
 <template>
   <div class="editor-container">
+    <bubble-menu :editor="editor" />
     <editor-content :editor="editor" />
     <pre><code>{{ output }}</code></pre>
     <pre><code>{{ outputHTML }}</code></pre>
@@ -9,6 +10,7 @@
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import  { Extensions } from '@/plugins/tiptap';
+import BubbleMenu from "@/views/editor/BubbleMenu.vue";
 
 import IconGripDotsVertical from "@/components/icons/IconGripDotsVertical.vue";
 import { generateJSON, generateHTML } from '@tiptap/html'
@@ -16,7 +18,8 @@ import { generateJSON, generateHTML } from '@tiptap/html'
 export default {
   components: {
     EditorContent,
-    IconGripDotsVertical
+    IconGripDotsVertical,
+    BubbleMenu
   },
   data() {
     return {

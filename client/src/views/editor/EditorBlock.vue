@@ -40,11 +40,22 @@ export default {
   background: white;
   position: relative;
 
-  .controls {
-    //display: none;
-    display: flex;
+  &:before {
+    content: '';
     position: absolute;
-    left: -84px;
+    width: calc(100% + 100px + 10px);
+    height: calc(100% + 20px);
+    //background-color: #2c3e50;
+    right: -10px;
+    top: -10px;
+    z-index: 0;
+  }
+
+  .controls {
+    display: none;
+    //display: flex;
+    position: absolute;
+    left: -90px;
 
     .editor-block-button {
       display: flex;
@@ -74,6 +85,7 @@ export default {
 
   .content {
     flex: 1 1 auto;
+    z-index: 1;
   }
 }
 </style>

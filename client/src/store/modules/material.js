@@ -3,7 +3,7 @@ const state = {
 };
 
 const getters = {
-  getColour: (state) => state.color[1]
+  getColour: (state) => state.colors[1]
 };
 
 const actions = {

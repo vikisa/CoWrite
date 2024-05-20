@@ -13,7 +13,10 @@ export default Node.create({
   },
   parseHTML() {
     return [
-      { tag: 'p' },
+      {
+        tag: 'p',
+        getAttrs: (node) => node.classList.length === 0
+      },
     ]
   },
   renderHTML({ HTMLAttributes }) {
