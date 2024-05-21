@@ -38,14 +38,14 @@ const router = createRouter({
       name: 'material',
       component: () => import('@/views/material/Home.vue'),
       children: [
-        {
+        /*{
           path: 'new',
           name: 'new-material',
           component: () => import('@/views/material/Index.vue'),
-        },
+        },*/
         {
-          path: 'try',
-          name: 'try',
+          path: 'new',
+          name: 'new-material',
           component: () => import('@/views/material/IndexCollab.vue'),
         }
       ]

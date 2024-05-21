@@ -8,10 +8,10 @@
           :default-active="activeLink"
           @select="handleSelectItem"
       >
-        <el-menu-item index="/material/try">
+<!--        <el-menu-item index="/material/try">
           <i class="fa-solid fa-bolt"></i>
           <span slot="title">try</span>
-        </el-menu-item>
+        </el-menu-item>-->
 
         <el-menu-item index="/material/new">
           <i class="fa-solid fa-plus"></i>

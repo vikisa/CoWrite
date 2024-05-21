@@ -12,7 +12,7 @@ import { Editor, EditorContent } from '@tiptap/vue-3';
 import  { Extensions } from '@/plugins/tiptap';
 import BubbleMenu from "@/views/editor/BubbleMenu.vue";
 
-import IconGripDotsVertical from "@/components/icons/IconGripDotsVertical.vue";
+import IconGripDotsVertical from "@/views/components/icons/IconGripDotsVertical.vue";
 import { generateJSON, generateHTML } from '@tiptap/html'
 
 export default {

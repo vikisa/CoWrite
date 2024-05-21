@@ -46,7 +46,7 @@
 
 <script>
 import { NodeViewContent, nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import IconGripDotsVertical from "@/components/icons/IconGripDotsVertical.vue";
+import IconGripDotsVertical from "@/views/components/icons/IconGripDotsVertical.vue";
 
 export default {
   props: nodeViewProps,

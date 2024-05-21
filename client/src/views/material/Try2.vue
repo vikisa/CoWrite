@@ -22,7 +22,6 @@ export default {
     EditorContent,
     InlineMenu,
     LinkMenu,
-    BlockMenu
   },
   data() {
     return {
