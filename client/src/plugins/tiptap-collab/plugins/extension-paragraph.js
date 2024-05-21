@@ -2,9 +2,7 @@ import { mergeAttributes, Node } from '@tiptap/core'
 
 export default Node.create({
   name: 'paragraph',
-  priority: 1000,
   group: 'block',
-  draggable: true,
   content: 'inline*',
   addOptions() {
     return {

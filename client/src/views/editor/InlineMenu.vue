@@ -17,11 +17,11 @@
       >
         <i class="fa-solid fa-italic"/>
       </el-button>
-<!--      <el-button @click="editor.chain().focus().toggleDirectSpeech().run()"
-                 :class="{ 'is-active': editor.isActive('strike') }"
+      <el-button @click="editor.chain().focus().toggleDirectSpeech().run()"
+                 :class="{ 'is-active': editor.isActive('direct-speech') }"
       >
         <i class="fa-solid fa-angles-left"/>
-      </el-button>-->
+      </el-button>
       <el-button @click="editor.chain().focus().insertLink().run()">
         <i class="fa-solid fa-link"></i>
       </el-button>
@@ -30,13 +30,22 @@
 </template>
 
 <script>
+import {isNodeActive, isTextSelection} from '@tiptap/core'
 import { BubbleMenu } from '@tiptap/vue-3'
 export default {
   components: { BubbleMenu },
   props: ['editor'],
   methods: {
-    shouldShow({ editor, view, state, oldState, from, to }) {
-      return from !== to && !document.querySelector('a.ProseMirror-selectednode');
+    shouldShow({ editor }) {
+      const {
+        state: {
+          doc,
+          selection,
+          selection: { empty, from, to },
+        },
+      } = editor.view;
+
+      return from !== to && !isNodeActive(editor.view.state, 'link');
     }
   }
 }

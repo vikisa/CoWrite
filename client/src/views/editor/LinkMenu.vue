@@ -20,6 +20,7 @@
 
 <script>
 import { BubbleMenu } from '@tiptap/vue-3';
+import {isNodeActive} from "@tiptap/core";
 export default {
   components: { BubbleMenu },
   props: ['editor'],
@@ -29,8 +30,8 @@ export default {
     }
   },
   methods: {
-    shouldShow() {
-      return document.querySelector('a.ProseMirror-selectednode');
+    shouldShow({ editor }) {
+      return isNodeActive(editor.view.state, 'link');
     },
     updateLink() {
       const myNodePos = this.editor.$pos(this.editor.options.cursorStartPos+1);

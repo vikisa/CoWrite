@@ -15,10 +15,7 @@ export default Node.create({
     return [
       {
         tag: 'p',
-        getAttrs: (node) => {
-          console.log('node.classList.contains(\'help-comment\')',node.classList.contains('help-comment'))
-          return node.classList.contains('help-comment')
-        } ,
+        getAttrs: (node) =>  node.classList.contains('help-comment'),
       },
     ];
   },

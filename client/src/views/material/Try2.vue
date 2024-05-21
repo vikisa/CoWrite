@@ -1,7 +1,7 @@
 <template>
-  <div class="editor-container" v-if="editor">
-    <BubbleMenu :editor="editor" />
-    <LinkBubbleMenu :editor="editor" />
+  <div v-if="editor" class="editor-container">
+    <InlineMenu :editor="editor" />
+    <LinkMenu :editor="editor" />
     <EditorContent :editor="editor" />
   </div>
 </template>
@@ -14,14 +14,15 @@ import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import { WebrtcProvider } from "y-webrtc";
 import {mapGetters} from "vuex";
 import  { Extensions } from '@/plugins/tiptap-collab';
-import BubbleMenu from "@/views/editor/BubbleMenu.vue";
-import LinkBubbleMenu from "@/views/editor/LinkBubbleMenu.vue";
+import InlineMenu from "@/views/editor/InlineMenu.vue";
+import LinkMenu from "@/views/editor/LinkMenu.vue";
 
 export default {
   components: {
     EditorContent,
-    BubbleMenu,
-    LinkBubbleMenu
+    InlineMenu,
+    LinkMenu,
+    BlockMenu
   },
   data() {
     return {
@@ -58,14 +59,18 @@ export default {
       ],
       editorProps: {
         handleDOMEvents: {
-          dragend: (slice, move) => {
-            this.editor.commands.setTextSelection(this.editor.options.cursorStartPos)
-          }
+          drop: () => {
+            const myNodePos = this.editor.$pos(this.editor.options.cursorStartPos + 1);
+            this.$nextTick(() => {
+              this.editor.commands.setTextSelection(this.editor.options.cursorStartPos + myNodePos.node.nodeSize - 1)
+            });
+          },
         }
       }
     });
     this.editor.commands.setContent(
-        '<p>I’m running Tiptap with Vue.js. 🎉</p>' +
+        '<p></p>' +
+        '<p>I’m <span class="direct-speech">running</span> Tiptap with Vue.js. 🎉</p>' +
         '<p>I’m running 111111111111</p>' +
         '<p>Followed 2222222</p>' +
         '<p>I’m running Tiptap 3333333</p>' +
@@ -78,6 +83,7 @@ export default {
         '<table><tbody><tr><th>Name</th><th colspan="3">Description</th></tr><tr>' +
         '<td>Cyndi Lauper</td><td>singer</td><td>songwriter</td><td>actress</td></tr></tbody></table>'
     );
+    this.editor.commands.setTextSelection(0);
   },
   methods: {
   },
@@ -95,15 +101,19 @@ export default {
     margin-left: 72px;
     border: 2px solid #dcdfe6;
     border-radius: 0.5rem;
+    padding-bottom: 200px;
 
     & > * {
-      //max-width: 42rem;
-
       margin: 20px 10px;
     }
 
     p {
       line-height: 32px;
+    }
+
+    .direct-speech {
+      color: #5d514d;
+      font-style: italic;
     }
 
     blockquote {
@@ -189,13 +199,6 @@ export default {
     }
   }
 }
-
-/*.ProseMirror {
-  margin-left: 72px;
-  border-radius: 0.5rem;
-  padding: 0.7rem;
-  border: 2px solid #dcdfe6;
-}*/
 
 /* Give a remote user a caret */
 .collaboration-cursor__caret {
