@@ -1,7 +1,7 @@
 <template>
   <node-view-wrapper class="editor-block" @mouseleave="mouseleaveHandler">
     <div class="controls">
-      <div @click="addParagraph" class="editor-block-button"
+      <div @click="addContent('<p></p>')" class="editor-block-button"
            contenteditable="false">
         <i class="fa-solid fa-plus"/>
       </div>
@@ -14,28 +14,28 @@
       </div>
 
       <div v-if="visible" class="block-menu-container">
-        <el-button @click="toggleParagraph" :class="{ 'is-active': isNodeActive('paragraph') }">
+<!--        <el-button @click="toggleParagraph" :class="{ 'is-active': isNodeActive('paragraph') }">
           <i class="fa-solid fa-paragraph"></i>
-        </el-button>
-        <el-button @click="toggleHeading" :class="{ 'is-active': isNodeActive('heading') }">
+        </el-button>-->
+        <el-button @click="addContent('<h3></h3>')" :class="{ 'is-active': isNodeActive('heading') }">
           <i class="fa-solid fa-heading"></i>
         </el-button>
-        <el-button @click="toggleBulletList" :class="{ 'is-active': isNodeActive('bulletList') }">
+        <el-button @click="addContent('<ul><li></li></ul>')" :class="{ 'is-active': isNodeActive('bulletList') }">
           <i class="fa-solid fa-list-ul"></i>
         </el-button>
-        <el-button @click="toggleOrderedList" :class="{ 'is-active': isNodeActive('orderedList') }">
+        <el-button @click="addContent('<ol><li></li></ol>')" :class="{ 'is-active': isNodeActive('orderedList') }">
           <i class="fa-solid fa-list-ol"></i>
         </el-button>
-        <el-button @click="toggleBlockquote(isNodeActive('blockquote'))" :class="{ 'is-active': isNodeActive('blockquote') }">
+        <el-button @click="addContent('<blockquote></blockquote>')" :class="{ 'is-active': isNodeActive('blockquote') }">
           <i class="fa-solid fa-quote-left"></i>
         </el-button>
-        <el-button @click="toggleHelpComment" :class="{ 'is-active': isNodeActive('help-comment') }">
+        <el-button @click="addContent(helpComment)" :class="{ 'is-active': isNodeActive('help-comment') }">
           <i class="fa-solid fa-info"></i>
         </el-button>
-        <el-button @click="toggleEditorComment" :class="{ 'is-active': isNodeActive('editor-comment') }">
+        <el-button @click="addContent(editorComment)" :class="{ 'is-active': isNodeActive('editor-comment') }">
           <i class="fa-solid fa-pen"></i>
         </el-button>
-        <el-button @click="toggleTable" :class="{ 'is-active': isNodeActive('table') }">
+        <el-button @click="addContent(table)" :class="{ 'is-active': isNodeActive('table') }">
           <i class="fa-solid fa-table"></i>
         </el-button>
       </div>
@@ -52,7 +52,10 @@ export default {
   props: nodeViewProps,
   data() {
     return {
-      visible: false
+      visible: false,
+      helpComment: '<p class="help-comment"></p>',
+      editorComment: '<p class="editor-comment"></p>',
+      table: '<table><tbody><tr><th></th><th colspan="3"></th></tr><tr><td></td><td></td><td></td><td></td></tr></tbody></table>'
     }
   },
   components: {
@@ -61,14 +64,16 @@ export default {
     IconGripDotsVertical
   },
   computed: {},
+  mounted() {
+  },
   methods: {
     mouseleaveHandler() {
       this.visible = false;
     },
-    addParagraph() {
+    addContent(html) {
       this.editor.commands.insertContentAt(
-          1,
-          '<p></p>',
+          this.getPos() + this.node.nodeSize,
+          html,
           {
             updateSelection: true,
           }
@@ -78,99 +83,14 @@ export default {
       const editorBlock = this.editor.$pos(this.getPos() + 1);
       const editorBlockContent = editorBlock.firstChild;
       this.editor.commands.setTextSelection(editorBlockContent.pos);
-      console.log(
-          'selectedNode',
-          this.editor.$pos(editorBlockContent.pos).node.type.name,
-          this.editor.$pos(editorBlockContent.pos).node
-      )
     },
     openBlockMenu() {
       this.selectEditorBlockContent();
-
       this.visible = !this.visible;
-
-      /*this.editor.commands.setTextSelection(this.getPos() + 1)
-
-      this.editor.commands.insertContentAt(
-          1,
-          '<p>Followed by a fancy draggable item.</p>'
-      );*/
-
-      /*this.editor.commands.insertContentAt(
-          1,
-        {
-          type: 'editorBlock',
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                {
-                  type: 'text',
-                  text: 'First paragraph',
-                },
-              ],
-            }
-          ],
-        },
-        {
-          updateSelection: true,
-        }
-      )*/
     },
     isNodeActive(typeName) {
       return this.editor.isActive(typeName);
     },
-    toggleParagraph() {
-      this.editor.commands.clearNodes();
-      this.selectEditorBlockContent();
-    },
-    toggleHeading() {
-      this.editor.commands.toggleHeading({ level: 3 });
-      this.selectEditorBlockContent();
-    },
-    toggleBulletList() {
-      this.editor.commands.toggleBulletList();
-    },
-    toggleOrderedList() {
-      this.editor.commands.toggleNode('paragraph', 'orderedList')
-      //this.editor.commands.toggleOrderedList();
-    },
-    toggleNode() {
-      this.editor.commands.toggleNode('paragraph', 'orderedList')
-    },
-    toggleBlockquote(isBlockquote) {
-      console.log('isBlockquote',isBlockquote)
-      console.log('this.editor.isActive(\'blockquote\')',this.editor.isActive('blockquote'))
-      return;
-      if (this.editor.isActive('blockquote')) {
-        console.log('blockquote')
-        this.editor.commands.clearNodes();
-        this.selectEditorBlockContent();
-      }
-      else {
-        this.editor.commands.setBlockquote();
-        this.selectEditorBlockContent();
-      }
-    },
-    toggleHelpComment() {
-      if (this.isNodeActive('help-comment'))
-        this.editor.commands.setParagraph();
-      else
-        this.editor.commands.setHelpComment();
-
-      //this.editor.commands.clearNodes();
-      //console.log('toggleHelpComment', this.node.firstChild)
-    },
-    toggleEditorComment() {
-      this.editor.commands.toggleEditorComment();
-    },
-    toggleTable() {
-      if (this.isNodeActive('table'))
-        this.editor.commands.deleteTable();
-      else
-        this.editor.commands.insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-
-    }
   },
 }
 </script>

@@ -1,37 +1,92 @@
-<script setup lang="ts">
+<template>
+  <EditorContent :editor="editor" />
+</template>
+
+<script>
 import * as Y from 'yjs';
-import { useEditor, EditorContent } from "@tiptap/vue-3";
+import { EditorContent, Editor} from "@tiptap/vue-3";
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import { WebrtcProvider } from "y-webrtc";
-const ydoc = new Y.Doc();
-const provider = new WebrtcProvider("tiptap-test", ydoc);
-const editor = useEditor({
-  content: "<p>Hello world!</p>",
-  extensions: [
-    Document,
-    Paragraph,
-    Text,
-    Collaboration.configure({
-      document: ydoc,
-    }),
-    CollaborationCursor.configure({
-      provider: provider,
-      user: {
-        name: "Qwerty",
-        color: "#DDFD9B"
-      }
-    })
-  ]
-});
-</script>
+import InlineMenu from "@/views/editor/InlineMenu.vue";
+import LinkMenu from "@/views/editor/LinkMenu.vue";
+import {mapGetters, mapState} from "vuex";
+import {HocuspocusProvider} from "@hocuspocus/provider";
 
-<template>
-  <EditorContent :editor="editor" />
-</template>
+export default {
+  components: {
+    EditorContent,
+    InlineMenu,
+    LinkMenu,
+  },
+  data() {
+    return {
+      materialId: null,
+      provider: null,
+      editor: null,
+    }
+  },
+  computed: {
+    ...mapState([]),
+    ...mapGetters(['userFullName','getColour','materialData','userData'])
+  },
+  mounted() {
+    const ydoc = new Y.Doc();
+
+    this.provider = new HocuspocusProvider({
+      url: "ws://127.0.0.1:1234",
+      name: "example-document",
+      document: ydoc,
+    });
+
+    this.provider.on('status', event => {
+      this.status = event.status
+    })
+
+    this.editor = new Editor({
+      cursorStartPos: 0,
+      cursorEndPos: 0,
+      onTransaction({ transaction }) {
+        this.options.cursorStartPos = transaction.selection.$from.pos;
+        this.options.cursorEndPos = transaction.selection.$to.pos;
+      },
+      extensions: [
+        Document,
+        Text,
+        Paragraph,
+        Collaboration.configure({
+          document: ydoc,
+        }),
+        CollaborationCursor.configure({
+          provider: this.provider,
+          user: {
+            name: this.userFullName,
+            color: this.getColour
+          }
+        })
+      ],
+      /*editorProps: {
+        handleDOMEvents: {
+          drop: () => {
+            const myNodePos = this.editor.$pos(this.editor.options.cursorStartPos + 1);
+            this.$nextTick(() => {
+              this.editor.commands.setTextSelection(this.editor.options.cursorStartPos + myNodePos.node.nodeSize - 1)
+            });
+          },
+        }
+      }*/
+    });
+    this.editor.commands.setContent(this.materialData.text);
+    //this.editor.commands.setTextSelection(3);
+  },
+  beforeUnmount() {
+    this.editor.destroy();
+    this.provider.destroy();
+  },
+}
+</script>
 
 <style lang="scss">
 .ProseMirror {

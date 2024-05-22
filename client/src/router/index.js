@@ -38,11 +38,11 @@ const router = createRouter({
       name: 'material',
       component: () => import('@/views/material/Home.vue'),
       children: [
-        /*{
-          path: 'new',
-          name: 'new-material',
-          component: () => import('@/views/material/Index.vue'),
-        },*/
+        {
+          path: 'edit/:editingId',
+          name: 'edit-material',
+          component: () => import('@/views/material/IndexCollab.vue'),
+        },
         {
           path: 'new',
           name: 'new-material',

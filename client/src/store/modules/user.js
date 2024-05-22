@@ -3,7 +3,8 @@ const state = {
 };
 
 const getters = {
-  userFullName: (state) => `${state.userData.firstname} ${state.userData.lastname}`
+  userFullName: (state) => `${state.userData.firstname} ${state.userData.lastname}`,
+  userData: state => state.userData
 };
 
 const actions = {

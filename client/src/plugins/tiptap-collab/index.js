@@ -60,5 +60,5 @@ export const Extensions = [
     types: ["editorBlock"],
     createId: () => window.crypto.randomUUID(),
   }),*/
-  History
+  /*History*/
 ];

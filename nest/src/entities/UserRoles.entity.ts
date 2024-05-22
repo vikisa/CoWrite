@@ -1,6 +1,5 @@
 import {Column, Entity, PrimaryGeneratedColumn, Unique, OneToOne, JoinColumn} from "typeorm";
 import {Length} from "class-validator";
-import {Users} from "./Users.entity";
 
 @Entity('user_roles', { schema: 'public' })
 @Unique(['id'])

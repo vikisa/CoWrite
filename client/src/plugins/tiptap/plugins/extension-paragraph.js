@@ -29,8 +29,8 @@ export default Node.create({
     return {
       'Mod-Alt-0': () => this.editor.commands.setParagraph(),
       'Enter': () => {
-        console.log('enter');
-        this.editor.commands.addEditorBlock();
+        //console.log('enter');
+        //this.editor.commands.addEditorBlock();
       }
     }
   },

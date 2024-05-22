@@ -24,12 +24,12 @@ export default Node.create({
   addCommands() {
     return {
       addEditorBlock: () => ({ chain }) => {
-        console.log('this.editor',this.editor)
+        /*console.log('this.editor',this.editor)
         return chain()
           .selectParentNode()
           .selectParentNode()
           .createParagraphNear()
-          .run();
+          .run();*/
 
       },
     }
