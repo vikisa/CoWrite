@@ -23,6 +23,7 @@ const actions = {
       localStorage.setItem('user-token', token);
       commit('setToken', token);
       dispatch('getUserData', token);
+      await router.push({ name: 'home' });
     }
     else {
       localStorage.removeItem('user-token');

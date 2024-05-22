@@ -25,21 +25,42 @@ const router = createRouter({
 
     {
       path: '/',
+      name: 'home',
+      component: () => import('@/views/List.vue')
+    },
+    {
+      path: '/list',
       name: 'list',
       component: () => import('@/views/List.vue')
     },
     {
       path: '/material',
       name: 'material',
-      component: () => import('@/views/material/Index.vue')
-    }
+      component: () => import('@/views/material/Home.vue'),
+      children: [
+        {
+          path: 'edit/:editingId',
+          name: 'edit-material',
+          component: () => import('@/views/material/IndexCollab.vue'),
+        },
+        {
+          path: 'new',
+          name: 'new-material',
+          component: () => import('@/views/material/IndexCollab.vue'),
+        }
+      ]
+    },
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
   const isAuthenticated = store.getters.isAuthenticated;
 
-  // роутинг с предварительной проверкой прав
+  // если login/register и авторизован, перенаправляем на список
+  if (to.matched.some((record) => record.meta.notRequiresAuth) && isAuthenticated) {
+    return next({ name: 'list' });
+  }
+
   if (to.matched.some((record) => record.meta.notRequiresAuth)) {
     next();
   } else if (isAuthenticated) {

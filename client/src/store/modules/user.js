@@ -1,10 +1,10 @@
-import router from '@/router';
-
 const state = {
   userData: null,
 };
 
 const getters = {
+  userFullName: (state) => `${state.userData.firstname} ${state.userData.lastname}`,
+  userData: state => state.userData
 };
 
 const actions = {
@@ -18,7 +18,6 @@ const actions = {
 
     if (response.ok) {
       commit('updateUser', await response.json());
-      await router.push('/');
     } else {
       localStorage.removeItem('user-token');
       console.error(response.status);
@@ -29,6 +28,7 @@ const actions = {
 const mutations = {
   updateUser(state, val) {
     state.userData = val;
+    console.log('state.userData',state.userData)
   },
 };
 

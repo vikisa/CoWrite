@@ -11,7 +11,6 @@ const getters = {
       message: message,
       type: type || state.type,
       duration: duration ?? state.duration,
-      offset: getters.mobileView ? 54 : 84,
     }
     ElNotification(Object.assign(options, additionalProperty))
   },
