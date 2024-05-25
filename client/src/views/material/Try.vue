@@ -35,15 +35,15 @@ export default {
   mounted() {
     const ydoc = new Y.Doc();
 
-    this.provider = new HocuspocusProvider({
+    /*this.provider = new HocuspocusProvider({
       url: "ws://127.0.0.1:1234",
       name: "example-document",
       document: ydoc,
-    });
+    });*/
 
-    this.provider.on('status', event => {
+    /*this.provider.on('status', event => {
       this.status = event.status
-    })
+    })*/
 
     this.editor = new Editor({
       cursorStartPos: 0,
