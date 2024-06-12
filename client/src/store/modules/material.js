@@ -21,7 +21,7 @@ const getters = {
 
 const actions = {
   async getMaterialData({ commit, dispatch, state, getters }, editingId){
-    const response = await fetch(`http://localhost:8000/api/material/${editingId}`, {
+    const response = await fetch(`${process.env.APP_ROOT_API}material/${editingId}`, {
       headers: {'Content-Type': 'application/json'},
     });
 

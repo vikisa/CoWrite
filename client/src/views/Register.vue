@@ -95,7 +95,7 @@ export default {
     }
   },
   async mounted() {
-    const response = await fetch('http://localhost:8000/api/auth/roles', {
+    const response = await fetch(`${process.env.APP_ROOT_API}auth/roles`, {
       method: 'GET',
       headers: {'Content-Type': 'application/json'}
     });
@@ -110,7 +110,7 @@ export default {
       const body = this.form;
       delete body.repeatPassword;
 
-      await fetch('http://localhost:8000/api/auth/register', {
+      await fetch(`${process.env.APP_ROOT_API}auth/register`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(body)
