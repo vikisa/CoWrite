@@ -6,13 +6,8 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    origin: 'http://127.0.0.1:3290',
-    host: '127.0.0.1',
-    port: 3290,
-    fs: {
-      // Allow serving files from one level up to the project root
-      allow: ['/server/CoWrite']
-    },
+    host: 'localhost',
+    port: 3290
   },
   plugins: [
     vue(),
@@ -21,5 +16,5 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  },
+  }
 })
