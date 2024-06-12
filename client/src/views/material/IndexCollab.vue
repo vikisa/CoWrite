@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Editor from '@/views/material/Try.vue'
+import Editor from '@/views/components/editor-collab/EditorCollab.vue'
 import { customAlphabet } from 'nanoid';
 import {mapGetters, mapMutations, mapState,mapActions} from "vuex";
 const nanoid = customAlphabet('1234567890abcdef', 16)

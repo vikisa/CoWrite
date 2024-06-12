@@ -1,5 +1,5 @@
 <template>
-  <EditorContent :editor="editor" />
+  <EditorContent class="editor-container" :editor="editor" />
 </template>
 
 <script>
@@ -96,6 +96,14 @@ export default {
 </script>
 
 <style lang="scss">
+.editor-container {
+  margin-left: 72px;
+  max-width: 100%;
+  box-sizing: border-box;
+  width: calc(100% - 72px);
+  margin-bottom: 20px;
+}
+
 .ProseMirror {
   font-size: 1.5rem;
   border-radius: 0.5rem;
