@@ -36,14 +36,30 @@ export default {
     const ydoc = new Y.Doc();
 
     this.provider = new HocuspocusProvider({
-      url: "ws://127.0.0.1:1234",
+      url: "ws://127.0.0.1:1234/collaboration",
       name: "example-document",
       document: ydoc,
+      onOpen() {
+        console.log('open')
+      },
+      onConnect() {
+        console.log('connect')
+      },
     });
 
     this.provider.on('status', event => {
       this.status = event.status
     })
+
+    this.provider.on("synced", () => {
+      console.log('synced')
+    });
+
+    this.provider.setAwarenessField("user", {
+      // Share any information you like
+      name: this.userFullName,
+      color: this.getColour,
+    });
 
     this.editor = new Editor({
       cursorStartPos: 0,

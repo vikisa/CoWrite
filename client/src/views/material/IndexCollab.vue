@@ -5,7 +5,7 @@
       <editor />
     </el-col>
     <el-col :span="4">
-      history
+      history1
     </el-col>
   </el-row>
 </template>
