@@ -47,15 +47,20 @@ export default {
       onConnect() {
         console.log('connect')
       },
+      onSynced() {
+        console.log('synced', ydoc)
+
+        if( !ydoc.getMap('config').get('initialContentLoaded') && this.editor ){
+          ydoc.getMap('config').set('initialContentLoaded', true);
+
+          this.editor.commands.setContent(this.materialData.text)
+        }
+      }
     });
 
     this.provider.on('status', event => {
       this.status = event.status
     })
-
-    this.provider.on("synced", () => {
-      console.log('synced')
-    });
 
     this.provider.setAwarenessField("user", {
       name: this.userFullName,
@@ -87,7 +92,7 @@ export default {
         }
       }
     });
-    this.editor.commands.setContent(this.materialData.text);
+    //this.editor.commands.setContent(this.materialData.text);
   },
   beforeUnmount() {
     this.editor.destroy();

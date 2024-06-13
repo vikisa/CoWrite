@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
-import {Not, Repository} from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from "../../entities/Users.entity";
-import { UserRoles } from "../../entities/UserRoles.entity";
+import { Users } from '../../entities/Users.entity';
+import { UserRoles } from '../../entities/UserRoles.entity';
 import * as bcrypt from 'bcrypt';
-import { JwtService, JwtSignOptions } from "@nestjs/jwt";
+import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class AuthService {
     @InjectRepository(UserRoles)
     private readonly userRolesRepository: Repository<UserRoles>,
     private configService: ConfigService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async register(data: any): Promise<Users> {
@@ -46,7 +46,7 @@ export class AuthService {
 
     const tokenData = {
       userId: user.id,
-      userLogin: user.username
+      userLogin: user.username,
     };
 
     return this.jwtService.sign(tokenData);
@@ -61,7 +61,7 @@ export class AuthService {
 
   async getRoles() {
     const roles = await this.userRolesRepository.find({
-      where: { id: Not(1) }
+      where: { id: Not(1) },
     });
     if (!roles) throw new NotFoundException('Роли не найдены');
 
