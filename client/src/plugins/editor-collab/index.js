@@ -52,5 +52,5 @@ export const Extensions = [
   Bold,
   Italic,
   DirectSpeech,
-  Link
+  Link,
 ];

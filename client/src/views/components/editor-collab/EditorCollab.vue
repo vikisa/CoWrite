@@ -1,19 +1,27 @@
 <template>
-  <EditorContent class="editor-container" :editor="editor" />
+  <div class="editor-container">
+    <LinkMenu v-if="editor" :editor="editor" />
+    <InlineMenu v-if="editor" :editor="editor" />
+    <EditorContent v-if="editor" :editor="editor" />
+  </div>
 </template>
 
 <script>
 import * as Y from 'yjs';
 import { EditorContent, Editor} from "@tiptap/vue-3";
-import  { Extensions } from '@/plugins/editor-collab';
+import { Extensions } from '@/plugins/editor-collab';
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import {mapGetters, mapState} from "vuex";
-import {HocuspocusProvider} from "@hocuspocus/provider";
+import { mapGetters, mapState } from "vuex";
+import { HocuspocusProvider } from "@hocuspocus/provider";
+import InlineMenu from "@/views/components/editor-collab/InlineMenu.vue";
+import LinkMenu from "@/views/components/editor-collab/LinkMenu.vue";
 
 export default {
   components: {
     EditorContent,
+    InlineMenu,
+    LinkMenu
   },
   data() {
     return {
@@ -55,12 +63,6 @@ export default {
     });
 
     this.editor = new Editor({
-      cursorStartPos: 0,
-      cursorEndPos: 0,
-      onTransaction({ transaction }) {
-        this.options.cursorStartPos = transaction.selection.$from.pos;
-        this.options.cursorEndPos = transaction.selection.$to.pos;
-      },
       extensions: [
         ...Extensions,
         Collaboration.configure({
@@ -72,7 +74,7 @@ export default {
             name: this.userFullName,
             color: this.getColour
           }
-        })
+        }),
       ],
       /*editorProps: {
         handleDOMEvents: {
