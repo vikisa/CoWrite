@@ -16,7 +16,7 @@ export default {
     }
   },
   async mounted() {
-    const response = await fetch('http://localhost:8000/api/material/get', {
+    const response = await fetch(`${process.env.APP_ROOT_API}material/get`, {
       headers: {'Content-Type': 'application/json'}
     });
     if (response.ok) {

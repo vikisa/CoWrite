@@ -9,7 +9,7 @@ const getters = {
 
 const actions = {
   async getUserData({ commit, dispatch, state, getters }, token){
-    const response = await fetch(`http://localhost:8000/api/auth/user`, {
+    const response = await fetch(`${process.env.APP_ROOT_API}auth/user`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',

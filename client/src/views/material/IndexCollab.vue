@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Editor from '@/views/material/Try.vue'
+import Editor from '@/views/components/editor-collab/EditorCollab.vue'
 import { customAlphabet } from 'nanoid';
 import {mapGetters, mapMutations, mapState,mapActions} from "vuex";
 const nanoid = customAlphabet('1234567890abcdef', 16)
@@ -36,7 +36,7 @@ export default {
 
     if (!this.editingId) {
       this.editingId = nanoid();
-      const response = await fetch(`http://localhost:8000/api/material/create`, {
+      const response = await fetch(`${process.env.APP_ROOT_API}material/create`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',

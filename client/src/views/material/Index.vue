@@ -36,7 +36,7 @@ export default {
 
     if (!this.editingId) {
       this.editingId = nanoid();
-      const response = await fetch(`http://localhost:8000/api/material/create`, {
+      const response = await fetch(`${process.env.APP_ROOT_API}material/create`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',
