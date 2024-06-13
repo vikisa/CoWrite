@@ -76,19 +76,18 @@ export default {
           }
         }),
       ],
-      /*editorProps: {
+      editorProps: {
         handleDOMEvents: {
           drop: () => {
-            const myNodePos = this.editor.$pos(this.editor.options.cursorStartPos + 1);
+            const myNodePos = this.editor.$pos(this.editor.state.selection.anchor + 1);
             this.$nextTick(() => {
-              this.editor.commands.setTextSelection(this.editor.options.cursorStartPos + myNodePos.node.nodeSize - 1)
+              this.editor.commands.setTextSelection(this.editor.state.selection.anchor + myNodePos.node.nodeSize - 1)
             });
           },
         }
-      }*/
+      }
     });
     this.editor.commands.setContent(this.materialData.text);
-    //this.editor.commands.setTextSelection(3);
   },
   beforeUnmount() {
     this.editor.destroy();
@@ -97,22 +96,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.editor-container {
-  margin-left: 72px;
-  max-width: 100%;
-  box-sizing: border-box;
-  width: calc(100% - 72px);
-  margin-bottom: 20px;
-}
-
-.ProseMirror {
-  font-size: 1.5rem;
-  border-radius: 0.5rem;
-  padding: 0.7rem;
-  border: 2px solid #dcdfe6;
-}
-
+<style lang="scss" scoped>
 /* Give a remote user a caret */
 .collaboration-cursor__caret {
   position: relative;

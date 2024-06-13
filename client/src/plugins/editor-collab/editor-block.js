@@ -3,7 +3,7 @@ import { VueNodeViewRenderer } from '@tiptap/vue-3'
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { nanoid } from 'nanoid';
 
-import Component from '@/views/editor/EditorBlock.vue'
+import Component from '@/views/components/editor-collab/EditorBlock.vue'
 
 const types = {
   ['editorBlock']: true,

@@ -4,6 +4,7 @@ import EditorBlock from '@/plugins/editor-collab/editor-block';
 import Text from '@tiptap/extension-text';
 
 // blocks
+import Dropcursor from '@tiptap/extension-dropcursor';
 import Paragraph from '@/plugins/editor-collab/paragraph';
 import Blockquote from '@/plugins/editor-collab/blockquote';
 import EditorComment from '@/plugins/editor-collab/editor-comment';
@@ -32,6 +33,7 @@ export const Extensions = [
   EditorBlock,
   Text,
 
+  Dropcursor,
   Paragraph,
   Blockquote,
   EditorComment,
