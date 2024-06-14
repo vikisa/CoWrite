@@ -44,7 +44,7 @@ export default {
       url: process.env.APP_COLLAB_API,
       name: this.materialData.editingId,
       document: ydoc,
-      token: '459824aaffa928e05f5b1caec411ae5f',
+      token: process.env.EDITOR_TOKEN,
       onOpen() {
         console.log('open')
       },
