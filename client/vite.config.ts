@@ -25,6 +25,7 @@ export default defineConfig(({ command, mode }) => {
       'process.env.APP_ROOT_API': JSON.stringify(env.APP_ROOT_API),
       'process.env.APP_COLLAB_API': JSON.stringify(env.APP_COLLAB_API),
       'process.env.APP_SOCKET_API': JSON.stringify(env.APP_SOCKET_API),
+      'process.env.EDITOR_TOKEN': JSON.stringify(env.EDITOR_TOKEN),
     },
   };
 });
