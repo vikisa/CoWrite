@@ -16,7 +16,7 @@ app.use(router)
 import dayjs from './plugins/day.js';
 app.use(dayjs);
 
-import { socket } from './plugins/socket';
-app.config.globalProperties.$socket = socket;
+/*import { socket } from './plugins/socket';
+app.config.globalProperties.$socket = socket;*/
 
 app.mount('#app')

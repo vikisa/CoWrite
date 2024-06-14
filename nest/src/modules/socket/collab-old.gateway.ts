@@ -6,10 +6,9 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Hocuspocus } from '@hocuspocus/server';
 
 @WebSocketGateway({
-  path: '/collab',
+  path: '/socket',
   cors: true,
 })
 export class CollabGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -18,7 +17,6 @@ export class CollabGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
-
   }
 
   handleDisconnect(client: Socket) {

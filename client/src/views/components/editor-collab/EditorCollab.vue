@@ -16,6 +16,7 @@ import { mapGetters, mapState } from "vuex";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import InlineMenu from "@/views/components/editor-collab/InlineMenu.vue";
 import LinkMenu from "@/views/components/editor-collab/LinkMenu.vue";
+import { IndexeddbPersistence } from 'y-indexeddb';
 
 export default {
   components: {
@@ -37,10 +38,13 @@ export default {
   mounted() {
     const ydoc = new Y.Doc();
 
+    new IndexeddbPersistence('example-document', ydoc);
+
     this.provider = new HocuspocusProvider({
       url: process.env.APP_COLLAB_API,
-      name: "example-document",
+      name: this.materialData.editingId,
       document: ydoc,
+      token: '459824aaffa928e05f5b1caec411ae5f',
       onOpen() {
         console.log('open')
       },
@@ -52,9 +56,16 @@ export default {
 
         if( !ydoc.getMap('config').get('initialContentLoaded') && this.editor ){
           ydoc.getMap('config').set('initialContentLoaded', true);
+          console.log('initialContentLoaded')
 
           this.editor.commands.setContent(this.materialData.text)
         }
+      },
+      onAuthenticated() {
+        console.log('onAuthenticate')
+      },
+      onMessage() {
+        console.log("New message received.");
       }
     });
 
@@ -80,6 +91,9 @@ export default {
             color: this.getColour
           }
         }),
+        /*Collaboration.configure({
+          fragment: ydoc.getXmlFragment('editorBlock'),
+        })*/
       ],
       editorProps: {
         handleDOMEvents: {
