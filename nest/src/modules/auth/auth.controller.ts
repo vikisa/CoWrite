@@ -1,17 +1,17 @@
-import { Controller, Get, Post, Body, Res, Param, UnauthorizedException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, UnauthorizedException } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { FilterAuthDto } from "./dto/filter-auth.dto";
+import { FilterAuthDto } from './dto/filter-auth.dto';
 
 import * as bcrypt from 'bcrypt';
-import { Response, Request } from "express";
-import { JwtService } from "@nestjs/jwt";
+import { Response } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   @Post('register')
@@ -25,7 +25,7 @@ export class AuthController {
       email,
       firstname,
       lastname,
-      role
+      role,
     });
     delete user.password;
 
@@ -36,7 +36,7 @@ export class AuthController {
   async login(
     @Body('username') username: string,
     @Body('password') password: string,
-    @Res({ passthrough: true }) response: Response
+    @Res({ passthrough: true }) response: Response,
   ) {
     return await this.authService.login(username, password);
   }
@@ -54,8 +54,7 @@ export class AuthController {
       const { password, ...result } = user;
 
       return result;
-    }
-    catch (e) {
+    } catch (e) {
       throw new UnauthorizedException('User not authorized');
     }
   }

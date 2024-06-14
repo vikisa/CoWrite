@@ -16,6 +16,7 @@ import { mapGetters, mapState } from "vuex";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import InlineMenu from "@/views/components/editor-collab/InlineMenu.vue";
 import LinkMenu from "@/views/components/editor-collab/LinkMenu.vue";
+import { IndexeddbPersistence } from 'y-indexeddb';
 
 export default {
   components: {
@@ -37,25 +38,40 @@ export default {
   mounted() {
     const ydoc = new Y.Doc();
 
+    new IndexeddbPersistence('example-document', ydoc);
+
     this.provider = new HocuspocusProvider({
       url: process.env.APP_COLLAB_API,
-      name: "example-document",
+      name: this.materialData.editingId,
       document: ydoc,
+      token: '459824aaffa928e05f5b1caec411ae5f',
       onOpen() {
         console.log('open')
       },
       onConnect() {
         console.log('connect')
       },
+      onSynced() {
+        console.log('synced', ydoc)
+
+        if( !ydoc.getMap('config').get('initialContentLoaded') && this.editor ){
+          ydoc.getMap('config').set('initialContentLoaded', true);
+          console.log('initialContentLoaded')
+
+          this.editor.commands.setContent(this.materialData.text)
+        }
+      },
+      onAuthenticated() {
+        console.log('onAuthenticate')
+      },
+      onMessage() {
+        console.log("New message received.");
+      }
     });
 
     this.provider.on('status', event => {
       this.status = event.status
     })
-
-    this.provider.on("synced", () => {
-      console.log('synced')
-    });
 
     this.provider.setAwarenessField("user", {
       name: this.userFullName,
@@ -75,6 +91,9 @@ export default {
             color: this.getColour
           }
         }),
+        /*Collaboration.configure({
+          fragment: ydoc.getXmlFragment('editorBlock'),
+        })*/
       ],
       editorProps: {
         handleDOMEvents: {
@@ -87,7 +106,7 @@ export default {
         }
       }
     });
-    this.editor.commands.setContent(this.materialData.text);
+    //this.editor.commands.setContent(this.materialData.text);
   },
   beforeUnmount() {
     this.editor.destroy();
@@ -97,30 +116,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* Give a remote user a caret */
-.collaboration-cursor__caret {
-  position: relative;
-  margin-left: -1px;
-  margin-right: -1px;
-  border-left: 1px solid #0D0D0D;
-  border-right: 1px solid #0D0D0D;
-  word-break: normal;
-  pointer-events: none;
-}
+.editor-container {
+  &:deep(.ProseMirror) {
+    .collaboration-cursor__caret {
+      position: relative;
+      margin-left: -1px;
+      margin-right: -1px;
+      border-left: 1px solid #0D0D0D;
+      border-right: 1px solid #0D0D0D;
+      word-break: normal;
+      pointer-events: none;
+    }
 
-/* Render the username above the caret */
-.collaboration-cursor__label {
-  position: absolute;
-  top: -1.4em;
-  left: -1px;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  user-select: none;
-  color: #0D0D0D;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px 3px 3px 0;
-  white-space: nowrap;
+    .collaboration-cursor__label {
+      position: absolute;
+      top: -1.4em;
+      left: -1px;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 600;
+      line-height: normal;
+      user-select: none;
+      color: #0D0D0D;
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px 3px 3px 0;
+      white-space: nowrap;
+    }
+  }
 }
 </style>

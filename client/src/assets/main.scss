@@ -19,6 +19,9 @@ body {
   .ProseMirror {
     outline: none !important;
     padding-bottom: 200px;
+    margin-top: 0.5rem;
+    line-height: 1.8;
+    box-sizing: border-box;
   }
 
   h3 {

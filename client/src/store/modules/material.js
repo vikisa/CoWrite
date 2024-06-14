@@ -15,7 +15,7 @@ const state = {
 };
 
 const getters = {
-  getColour: (state) => state.colors[2],
+  getColour: (state) => state.colors[Math.floor(Math.random() * state.colors.length)],
   materialData: (state) => state.materialData
 };
 
