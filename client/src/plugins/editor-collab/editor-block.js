@@ -1,8 +1,8 @@
 import { mergeAttributes, Node } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-3'
-import { Plugin, PluginKey } from '@tiptap/pm/state';
-import { nanoid } from 'nanoid';
-
+import { Plugin } from '@tiptap/pm/state';
+import { customAlphabet } from 'nanoid';
+const nanoid = customAlphabet('1234567890abcdef', 10)
 import Component from '@/views/components/editor-collab/EditorBlock.vue'
 
 const types = {
@@ -53,7 +53,7 @@ export default Node.create({
         attributes: {
           blockId: {
             default: null,
-            rendered: false,
+            rendered: true,
             keepOnSplit: false,
           },
         },
@@ -80,7 +80,7 @@ export default Node.create({
             ) {
               tr.setNodeMarkup(pos, undefined, {
                 ...node.attrs,
-                blockId: nanoid(10),
+                blockId: nanoid(),
               })
             }
           })

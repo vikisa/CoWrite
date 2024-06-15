@@ -16,7 +16,8 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() filterAuthDto: FilterAuthDto) {
-    const { username, password, email, firstname, lastname, role } = filterAuthDto;
+    const { username, password, email, firstname, lastname, role } =
+      filterAuthDto;
     const hashedPassword = await bcrypt.hash(password, 5);
 
     const user = await this.authService.register({
@@ -36,7 +37,6 @@ export class AuthController {
   async login(
     @Body('username') username: string,
     @Body('password') password: string,
-    @Res({ passthrough: true }) response: Response,
   ) {
     return await this.authService.login(username, password);
   }

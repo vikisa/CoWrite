@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const defaultMaterialState = {
   header: '',
   createDate: 0,
@@ -10,13 +12,20 @@ const defaultMaterialState = {
 const state = {
   isLoading: false,
   materialData: null,
-
-  colors: ['#D295BF', '#553555', '#DDF45B', '#35A7FF', '#F19953']
+  comments: {},
+  editors: [],
+  colors: ['#D295BF', '#553555', '#DDF45B', '#35A7FF', '#F19953'],
+  openedAddComment: '',
+  openedComment: ''
 };
 
 const getters = {
   getColour: (state) => state.colors[Math.floor(Math.random() * state.colors.length)],
-  materialData: (state) => state.materialData
+  materialData: (state) => state.materialData,
+  editors: (state) => state.editors,
+  comments: (state) => state.comments,
+  openedAddComment: (state) => state.openedAddComment,
+  openedComment: (state) => state.openedComment,
 };
 
 const actions = {
@@ -32,6 +41,18 @@ const actions = {
       console.error(response.status);
     }
   },
+  async getComments({ commit }, editingId) {
+    const response = await fetch(`${process.env.APP_ROOT_API}comment/${editingId}`, {
+      headers: {'Content-Type': 'application/json'},
+    });
+
+    if (response.ok) {
+      const comments = await response.json();
+      _.forEach(comments, comment => commit('addComment', comment))
+    } else {
+      console.error('getComments');
+    }
+  }
 };
 
 const mutations = {
@@ -40,6 +61,21 @@ const mutations = {
   },
   setIsLoading(state, isLoading) {
     state.isLoading = isLoading;
+  },
+  setEditors(state, value) {
+    state.editors = value;
+  },
+  addComment(state, value) {
+    if (!state.comments.hasOwnProperty(value.blockId))
+      state.comments[value.blockId] = [];
+
+    state.comments[value.blockId].push(value);
+  },
+  setOpenedAddComment(state, value) {
+    state.openedAddComment = value;
+  },
+  setOpenedComment(state, value) {
+    state.openedComment = value;
   }
 };
 

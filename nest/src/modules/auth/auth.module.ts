@@ -5,10 +5,10 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 import { Users } from '../../entities/Users.entity';
-import { UserRoles } from "../../entities/UserRoles.entity";
+import { UserRoles } from '../../entities/UserRoles.entity';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   controllers: [AuthController],

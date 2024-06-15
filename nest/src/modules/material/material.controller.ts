@@ -8,9 +8,7 @@ import {FilterAuthDto} from "../auth/dto/filter-auth.dto";
 
 @Controller('api/material')
 export class MaterialController {
-  constructor(
-    private materialService: MaterialService,
-  ) {}
+  constructor(private materialService: MaterialService) {}
 
   @Post('create')
   async createMaterial(

@@ -11,7 +11,7 @@ import { Server, Socket } from 'socket.io';
   path: '/socket',
   cors: true,
 })
-export class CollabGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   constructor() {}
 
@@ -21,5 +21,10 @@ export class CollabGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
+  }
+
+  @SubscribeMessage('addComment')
+  async addComment(editingId: string, payload: object) {
+    this.server.emit('new-comment', { editingId, ...payload });
   }
 }
