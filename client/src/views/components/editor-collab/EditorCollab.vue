@@ -1,5 +1,5 @@
 <template>
-  <div class="editor-container">
+  <div class="editor-container" v-if="editorLoaded">
     <LinkMenu v-if="editor" :editor="editor" />
     <InlineMenu v-if="editor" :editor="editor" />
     <EditorContent v-if="editor" :editor="editor" />
@@ -29,6 +29,7 @@ export default {
       materialId: null,
       provider: null,
       editor: null,
+      editorLoaded: false
     }
   },
   computed: {
@@ -46,26 +47,26 @@ export default {
       document: ydoc,
       token: process.env.EDITOR_TOKEN,
       onOpen() {
-        console.log('open')
+        //console.log('open')
       },
       onConnect() {
-        console.log('connect')
+        //console.log('connect')
       },
       onSynced() {
-        console.log('synced', ydoc)
+        //console.log('synced', ydoc)
 
         if( !ydoc.getMap('config').get('initialContentLoaded') && this.editor ){
           ydoc.getMap('config').set('initialContentLoaded', true);
-          console.log('initialContentLoaded')
+          //console.log('initialContentLoaded')
 
           this.editor.commands.setContent(this.materialData.text)
         }
       },
       onAuthenticated() {
-        console.log('onAuthenticate')
+        //console.log('onAuthenticate')
       },
       onMessage() {
-        console.log("New message received.");
+        //console.log("New message received.");
       }
     });
 
@@ -100,13 +101,16 @@ export default {
           drop: () => {
             const myNodePos = this.editor.$pos(this.editor.state.selection.anchor + 1);
             this.$nextTick(() => {
-              this.editor.commands.setTextSelection(this.editor.state.selection.anchor + myNodePos.node.nodeSize - 1)
+              this.editor.commands.setTextSelection(this.editor.state.selection.anchor + myNodePos.node.nodeSize - 1);
             });
           },
         }
       }
     });
     //this.editor.commands.setContent(this.materialData.text);
+
+    this.$store.commit('setEditors', [{ id: 1, name: 'Lastname Firstname' }]);
+    this.editorLoaded = true;
   },
   beforeUnmount() {
     this.editor.destroy();

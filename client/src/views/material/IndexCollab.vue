@@ -1,11 +1,11 @@
 <template>
   <el-row :gutter="40" v-if="!isLoading && isPageLoaded">
-    <el-col :span="20">
+    <el-col :span="18">
       <el-input class="header" v-model="materialData.header"/>
       <editor />
     </el-col>
-    <el-col :span="4">
-      history1
+    <el-col :span="6">
+<!--      history1-->
     </el-col>
   </el-row>
 </template>
@@ -60,6 +60,7 @@ export default {
     }
     else {
       await this.getMaterialData(this.editingId);
+      await this.$store.dispatch('getComments', this.editingId);
       console.log('materialData',this.materialData)
       this.setIsLoading(false);
       this.isPageLoaded = true;

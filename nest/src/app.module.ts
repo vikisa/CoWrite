@@ -9,6 +9,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { MaterialModule } from './modules/material/material.module';
 import { SocketModule } from './modules/socket/socket.module';
 import { CollabModule } from './modules/collab/collab.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { CommentModule } from './modules/comment/comment.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,10 +32,21 @@ import { CollabModule } from './modules/collab/collab.module';
         synchronize: true,
       }),
     }),
+    RedisModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        config: {
+          host: config.get('redis.host'),
+          port: +config.get('redis.port'),
+          db: 1,
+        },
+      }),
+    }),
     AuthModule,
     MaterialModule,
     SocketModule,
     CollabModule,
+    CommentModule,
   ],
 })
 export class AppModule {}

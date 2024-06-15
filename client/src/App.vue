@@ -78,6 +78,7 @@ onMounted(async () => {
   if (userToken.value)
     await store.dispatch('getUserData', userToken.value);
 
+  await store.dispatch('socketConnect');
   await router.isReady();
   activeLink.value = route.path;
 })

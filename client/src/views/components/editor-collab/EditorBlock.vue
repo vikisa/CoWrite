@@ -1,6 +1,15 @@
 <template>
   <node-view-wrapper class="editor-block" @mouseleave="mouseleaveHandler">
-    <div class="controls">
+    <el-popover
+        ref="popoverRef"
+        trigger="click"
+        title="With title"
+        virtual-triggering
+        persistent
+    >
+      <span> Some content </span>
+    </el-popover>
+    <div class="left-control">
       <div @click="addContent('<p></p>')" class="editor-block-button"
            contenteditable="false">
         <i class="fa-solid fa-plus"/>
@@ -37,30 +46,86 @@
         </el-button>
       </div>
     </div>
-    <node-view-content class="content" />
+    <div class="right-control">
+      <el-popover
+          :teleported="true"
+          :visible="openedAddComment === node.attrs.blockId"
+          placement="right-start"
+          :width="250"
+          :offset="48"
+          :show-arrow="false"
+      >
+        <template #reference>
+          <div @click="toggleAddComment(openedAddComment === node.attrs.blockId)" class="editor-block-button"
+               contenteditable="false">
+            <i class="fa-regular fa-comment"></i>
+          </div>
+        </template>
+        <template #default>
+          <AddComment :block-id="node.attrs.blockId"/>
+        </template>
+      </el-popover>
+      <el-popover
+          :teleported="true"
+          :visible="openedComment === node.attrs.blockId"
+          placement="right-start"
+          :width="250"
+          :show-arrow="false"
+      >
+        <template #reference>
+          <div @click="toggleOpenedComment(openedComment === node.attrs.blockId)"
+               :class="['editor-block-button', {'disable-button': !showShowCommentsButton}]"
+               contenteditable="false">
+            <i class="fa-regular fa-eye"></i>
+          </div>
+        </template>
+        <template #default>
+          <Comments :block-id="node.attrs.blockId" :comments="comments[node.attrs.blockId]"/>
+        </template>
+      </el-popover>
+    </div>
+    <node-view-content :class="['content', {'comment-content': commentContent}]" />
   </node-view-wrapper>
 </template>
 
 <script>
 import { NodeViewContent, nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import IconGripDotsVertical from "@/views/components/icons/IconGripDotsVertical.vue";
+import {mapState,mapGetters} from "vuex";
+import AddComment from '@/views/components/editor-collab/AddComment.vue';
+import Comments from '@/views/components/editor-collab/Comments.vue';
 
 export default {
-  props: nodeViewProps,
+  node: {
+    type: Object,
+  },
   data() {
     return {
       visible: false,
       helpComment: '<p class="help-comment"></p>',
       editorComment: '<p class="editor-comment"></p>',
-      table: '<table><tbody><tr><th></th><th colspan="3"></th></tr><tr><td></td><td></td><td></td><td></td></tr></tbody></table>'
+      table: '<table><tbody><tr><th></th><th colspan="3"></th></tr><tr><td></td><td></td><td></td><td></td></tr></tbody></table>',
+      popoverRef: null,
+      visibleAddComment: false,
+      visibleComments: false,
     }
   },
   components: {
     NodeViewWrapper,
     NodeViewContent,
-    IconGripDotsVertical
+    IconGripDotsVertical,
+    AddComment,
+    Comments
   },
-  computed: {},
+  computed: {
+    ...mapGetters(['comments', 'openedAddComment', 'openedComment']),
+    showShowCommentsButton() {
+      return this.comments.hasOwnProperty(this.node.attrs.blockId)
+    },
+    commentContent() {
+      return this.node.attrs.blockId === this.openedComment || this.node.attrs.blockId === this.openedAddComment;
+    }
+  },
   mounted() {
   },
   methods: {
@@ -88,6 +153,27 @@ export default {
     isNodeActive(typeName) {
       return this.editor.isActive(typeName);
     },
+    log() {
+      console.log(this.node)
+    },
+    toggleAddComment(clear) {
+      this.$store.commit('setOpenedAddComment', clear ? '' : this.node.attrs.blockId)
+
+      if (this.openedAddComment === this.openedComment)
+        this.$store.commit('setOpenedComment', '');
+
+      if (!clear)
+        this.$store.commit('setOpenedComment', '');
+    },
+    toggleOpenedComment(clear) {
+      this.$store.commit('setOpenedComment', clear ? '' : this.node.attrs.blockId);
+
+      if (this.openedAddComment === this.openedComment)
+        this.$store.commit('setOpenedAddComment', '');
+
+      if (!clear)
+        this.$store.commit('setOpenedAddComment', '');
+    }
   },
 }
 </script>
@@ -103,20 +189,17 @@ export default {
   &:before {
     content: '';
     position: absolute;
-    width: calc(100% + 100px + 10px);
+    width: calc(100% + 100px + 10px + 60px);
+    //width: calc(100% + 100px + 10px + 400px);
     height: calc(100% + 20px);
     //background-color: #2c3e50;
-    right: -10px;
+    //right: -350px;
+    right: -85px;
     top: -10px;
     z-index: 0;
   }
 
-  .controls {
-    display: none;
-    //display: flex;
-    position: absolute;
-    left: -90px;
-
+  .left-control, .right-control {
     .editor-block-button {
       display: flex;
       align-items: center;
@@ -135,6 +218,24 @@ export default {
         background-color: #ecf5ff;
       }
     }
+  }
+
+  .right-control {
+    position: absolute;
+    right: -90px;
+    display: none;
+    //display: flex;
+
+    .disable-button {
+      visibility: hidden;
+    }
+  }
+
+  .left-control {
+    display: none;
+    //display: flex;
+    position: absolute;
+    left: -90px;
 
     .menu {
       z-index: 5;
@@ -142,7 +243,7 @@ export default {
   }
 
   &:hover {
-    .controls {
+    .left-control, .right-control {
       display: flex;
     }
   }
@@ -150,6 +251,21 @@ export default {
   .content {
     flex: 1 1 auto;
     z-index: 1;
+  }
+
+  .comment-content {
+    position: relative;
+
+    &:before {
+      position: absolute;
+      content: '';
+      width: calc(100% + 22px);
+      height: calc(100% + 1rem);
+      background-color: rgb(88 5 255 / 8%);
+      z-index: -1;
+      top: -8px;
+      left: -11px;
+    }
   }
 
   .block-menu-container {
