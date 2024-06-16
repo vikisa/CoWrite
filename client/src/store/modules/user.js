@@ -8,7 +8,7 @@ const getters = {
 };
 
 const actions = {
-  async getUserData({ commit, dispatch, state, getters }, token){
+  async getUserData({ commit, dispatch, state, rootGetters }, token){
     const response = await fetch(`${process.env.APP_ROOT_API}auth/user`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -18,6 +18,8 @@ const actions = {
 
     if (response.ok) {
       commit('updateUser', await response.json());
+      if (!rootGetters.editorToken)
+        dispatch('getEditorToken');
     } else {
       localStorage.removeItem('user-token');
       console.error(response.status);

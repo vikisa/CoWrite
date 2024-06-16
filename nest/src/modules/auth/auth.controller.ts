@@ -1,17 +1,17 @@
-import { Controller, Get, Post, Body, Res, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, UnauthorizedException } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { FilterAuthDto } from './dto/filter-auth.dto';
-
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   @Post('register')
@@ -38,6 +38,7 @@ export class AuthController {
     @Body('username') username: string,
     @Body('password') password: string,
   ) {
+    console.log(username, password)
     return await this.authService.login(username, password);
   }
 
@@ -45,6 +46,7 @@ export class AuthController {
   async user(@Body('token') token: string) {
     try {
       const data = await this.jwtService.verifyAsync(token);
+      console.log('data',data)
 
       if (!data) {
         throw new UnauthorizedException('User not authorized');
@@ -62,5 +64,33 @@ export class AuthController {
   @Get('roles')
   async roles() {
     return await this.authService.getRoles();
+  }
+
+  @Post('editor-token')
+  async getEditorToken(@Body('token') token: string) {
+    const data = await this.jwtService.verifyAsync(token);
+    console.log('data editor token',data,token)
+    if (!data) {
+      throw new UnauthorizedException('User not authorized');
+    }
+
+    const user = await this.authService.findOne({ id: data['id'] });
+    const userPayload = {
+      id: user.id,
+      fullname: `${user.lastname} ${user.firstname}`,
+    };
+    const userToken = this.jwtService.sign(userPayload);
+
+    const signOptions: JwtSignOptions = {
+      secret: this.configService.get('jwt.editor.secret'),
+      expiresIn: this.configService.get('jwt.editor.expiresIn'),
+    };
+
+    const payload = {
+      userToken: userToken,
+      editorToken: this.configService.get('editor_token'),
+    };
+
+    return this.jwtService.sign(payload, signOptions);
   }
 }

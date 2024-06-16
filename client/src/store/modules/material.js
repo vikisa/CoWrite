@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import * as Y from "yjs";
 
 const defaultMaterialState = {
   header: '',
@@ -16,7 +17,10 @@ const state = {
   editors: [],
   colors: ['#D295BF', '#553555', '#DDF45B', '#35A7FF', '#F19953'],
   openedAddComment: '',
-  openedComment: ''
+  openedComment: '',
+  authenticated: false,
+  loaded: false,
+  docStore: new Y.Doc()
 };
 
 const getters = {
@@ -26,6 +30,9 @@ const getters = {
   comments: (state) => state.comments,
   openedAddComment: (state) => state.openedAddComment,
   openedComment: (state) => state.openedComment,
+  authenticated: (state) => state.authenticated,
+  loaded: (state) => state.loaded,
+  docStore: (state) => state.docStore
 };
 
 const actions = {
@@ -76,7 +83,13 @@ const mutations = {
   },
   setOpenedComment(state, value) {
     state.openedComment = value;
-  }
+  },
+  setAuthenticated(state, value) {
+    state.authenticated = value;
+  },
+  setLoaded(state, value) {
+    state.loaded = value;
+  },
 };
 
 export default {

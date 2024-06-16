@@ -1,14 +1,14 @@
-import { Controller, Get, Post, Body, Res, Param, Request, ParseIntPipe } from '@nestjs/common';
-
+import { Controller, Get, Post, Body, Param, Request } from '@nestjs/common';
 import { MaterialService } from './material.service';
-
-import * as bcrypt from 'bcrypt';
-import { Response } from "express";
-import {FilterAuthDto} from "../auth/dto/filter-auth.dto";
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import { Redis } from 'ioredis';
 
 @Controller('api/material')
 export class MaterialController {
-  constructor(private materialService: MaterialService) {}
+  constructor(
+    private materialService: MaterialService,
+    @InjectRedis() private readonly redis: Redis,
+  ) {}
 
   @Post('create')
   async createMaterial(
@@ -19,16 +19,14 @@ export class MaterialController {
     @Body('creatorId') creatorId: string,
     @Body('editingId') editingId: string,
   ) {
-    const material = await this.materialService.createMaterial({
+    return await this.materialService.createMaterial({
       createDate,
       saveDate,
       text,
       header,
       creatorId,
-      editingId
+      editingId,
     });
-
-    return material;
   }
 
   @Get('get')
@@ -39,5 +37,73 @@ export class MaterialController {
   @Get(':id')
   async getMaterialsById(@Request() req, @Param('id') id: string) {
     return this.materialService.getMaterialByEditing(id);
+  }
+
+  @Get('check-version/:id')
+  async getLastVersion(@Request() req, @Param('id') id: string) {
+    const version = await this.redis.get(`material:version-${id}`);
+    let content;
+    if (version)
+      content = await this.redis.get(`material:content-${id}-${version}`);
+
+    console.log({ version, content });
+
+    return { version, content };
+  }
+
+  @Post('getOrCreate')
+  async getOrCreate(
+    @Body('createDate') createDate: string,
+    @Body('saveDate') saveDate: string,
+    @Body('text') text: string,
+    @Body('header') header: string,
+    @Body('creatorId') creatorId: string,
+    @Body('editingId') editingId: string,
+  ) {
+    const material = {
+      createDate,
+      saveDate,
+      text,
+      header,
+      creatorId,
+      editingId,
+    };
+
+    return this.materialService.getOrCreate(material);
+  }
+
+  @Post('saveMaterialContent')
+  async saveMaterialContent(
+    @Body('editingId') editingId: string,
+    @Body('userId') userId: number,
+    @Body('content') content: string,
+    @Body('snapshot') snapshot: string,
+    @Body('timestamp') timestamp: string,
+  ) {
+    const checkVersion = await this.redis.get(`material:version-${editingId}`);
+    const version = checkVersion ? Number(checkVersion) : 0;
+
+    if (version !== 0) await this.redis.del(`material:version-${editingId}`);
+    await this.redis.set(`material:version-${editingId}`, String(version + 1));
+
+    const contentData = {
+      userId: userId,
+      timestamp: timestamp,
+      content: content,
+    };
+    await this.redis.set(
+      `material:content-${editingId}-${version + 1}`,
+      JSON.stringify(contentData),
+    );
+
+    const snapshotData = {
+      userId: userId,
+      timestamp: timestamp,
+      snapshot: snapshot,
+    };
+    await this.redis.set(
+      `material:snapshot-${editingId}-${version + 1}`,
+      JSON.stringify(snapshotData),
+    );
   }
 }

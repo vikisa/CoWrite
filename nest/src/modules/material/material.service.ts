@@ -14,6 +14,20 @@ export class MaterialService {
     return this.materialRepository.save(data)
   }
 
+  async getOrCreate(data) {
+    try {
+      return {
+        material: await this.getMaterialByEditing(data.editingId),
+        message: 'Материал открыт',
+      };
+    } catch (e) {
+      return {
+        material: this.createMaterial(data),
+        message: 'Материал создан',
+      };
+    }
+  }
+
   async getMaterialByEditing(id) {
     const materialId: string = id;
     const material = await this.materialRepository.findOne({

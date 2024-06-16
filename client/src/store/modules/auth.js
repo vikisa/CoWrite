@@ -1,16 +1,18 @@
 import router from "@/router/index.js";
 
 const state = {
-  token: localStorage.getItem('user-token') || ''
+  token: localStorage.getItem('user-token') || '',
+  editorToken: ''
 };
 
 const getters = {
   isAuthenticated: (state) => !!state.token,
   token: (state) => state.token,
+  editorToken: (state) => state.editorToken,
 };
 
 const actions = {
-  async login({ commit, dispatch, state, getters }, userData) {
+  async login({ commit, dispatch, getters }, userData) {
     const response = await fetch(`${process.env.APP_ROOT_API}auth/login`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -31,17 +33,32 @@ const actions = {
       getters.showNotification('Что-то пошло не так', 'error');
     }
   },
-  async logout({ state, commit }) {
+  async logout({ commit }) {
     localStorage.removeItem('user-token');
     commit('setToken', '');
 
     await router.push('/login');
+  },
+  async getEditorToken({ state, commit }) {
+    const response = await fetch(`${process.env.APP_ROOT_API}auth/editor-token`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({token: state.token}),
+    });
+
+    if (response.ok) {
+      commit('setEditorToken', await response.text())
+    }
   }
 };
 
 const mutations = {
-  setToken(state, val) {
-    state.token = val;
+  setToken(state, value) {
+    state.token = value;
+  },
+  setEditorToken(state, value) {
+    state.editorToken = value;
   }
 };
 

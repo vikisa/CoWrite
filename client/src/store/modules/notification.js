@@ -6,7 +6,7 @@ const state = {
 };
 
 const getters = {
-  showNotification: (state, getters) => (message, type, duration, additionalProperty) => {
+  showNotification: (state) => (message, type, duration, additionalProperty) => {
     const options = {
       message: message,
       type: type || state.type,

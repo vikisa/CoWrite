@@ -18,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(data: any): Promise<Users> {
+  async register(data: any) {
     return this.userRepository.save(data);
   }
 
@@ -40,11 +40,12 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    if (!await bcrypt.compare(password, user.password)) {
+    if (!(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('User not authorized');
     }
 
     const tokenData = {
+      id: user.id,
       userId: user.id,
       userLogin: user.username,
     };

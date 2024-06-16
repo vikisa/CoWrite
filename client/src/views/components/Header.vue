@@ -22,5 +22,16 @@ export default {
 <style lang="scss" scoped>
 .header-container {
   border-bottom: solid 1px var(--el-menu-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &:deep(.editor-info-container) {
+    padding: 0px 20px;
+  }
+}
+
+.editor-info-container {
+
 }
 </style>

@@ -3,10 +3,10 @@ import {
   Unique,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   ManyToOne,
-  JoinColumn, AfterLoad
-} from "typeorm";
+  JoinColumn,
+  AfterLoad,
+} from 'typeorm';
 
 import { Length } from 'class-validator';
 
@@ -71,4 +71,18 @@ export class Users {
     referencedColumnName: 'id',
   })
   roles: UserRoles | any;
+
+  @AfterLoad()
+  setComputed() {
+    const lastname = [...this.lastname];
+    lastname[0] = lastname[0].toUpperCase();
+    this.lastname = lastname.join('');
+
+    const firstname = [...this.firstname];
+    firstname[0] = firstname[0].toUpperCase();
+    this.firstname = firstname.join('');
+
+    //delete this.u_lastname;
+    //delete this.u_firstname;
+  }
 }
