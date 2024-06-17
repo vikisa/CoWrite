@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import _ from 'lodash';
 
 const socketServer = `${process.env.APP_BASE_URL}`;
 const clientSocketOptions = {
@@ -13,17 +14,30 @@ const state = {
 };
 
 const actions = {
-  socketConnect({ state, commit, dispatch }) {
+  socketConnect({ state, dispatch }) {
     dispatch('bindSocketEvents');
     state.socket.connect();
   },
-  bindSocketEvents({ state, commit, dispatch, rootGetters }) {
+  bindSocketEvents({ state, commit, rootGetters }) {
     state.socket.on('connect', () => {
       console.log('socket connected')
 
       state.socket.on('new-comment', (payload) => {
         console.log('new-comment', payload)
         commit('addComment', payload);
+      });
+
+      state.socket.on('change-header', (payload) => {
+        console.log('change-header', payload)
+        if (rootGetters.materialData.editingId === payload.editingId)
+          commit('changeHeader', payload.header);
+      });
+
+      state.socket.on('add-editor', (payload) => {
+        console.log('add-editor', payload)
+        if (rootGetters.materialData.editingId === payload.editingId
+          && !_.map(rootGetters.editors, 'userId').includes(payload.editor.userId))
+          commit('addEditor', payload.editor);
       })
     });
 

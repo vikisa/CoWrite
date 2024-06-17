@@ -1,78 +1,108 @@
-import express from "express";
-import expressWebsockets from "express-ws";
-import { Hocuspocus } from "@hocuspocus/server";
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import { fromUint8Array, toUint8Array } from 'js-base64'
+import expressWebsockets from 'express-ws';
+import { Hocuspocus } from '@hocuspocus/server';
 import { Webhook, Events } from "@hocuspocus/extension-webhook";
 import { TiptapTransformer } from "@hocuspocus/transformer";
-import { Doc } from "yjs";
+import * as Y from 'yjs'
 import { Extensions } from "./extensions/index.js";
+import dotenv from 'dotenv'
+dotenv.config();
+import fetch from "node-fetch";
+import _ from 'lodash';
 
-import { IncomingMessage } from 'http'
-
-const secret = '459824aaffa928e05f5b1caec411ae5f';
+const emptyDoc = {"type":"doc","content":[{"type":"editorBlock","attrs":{"blockId":"b5e4133a74","number":0},"content":[{"type":"paragraph"}]}]};
 
 const server = new Hocuspocus({
   port: 1234,
-  async onAuthenticate({ token }) {
-    console.log('onAuthenticate')
-    // Example test if a user is authenticated
-    if (token !== '459824aaffa928e05f5b1caec411ae5f') {
-      throw new Error('Not authorized!')
-    }
+  async onAuthenticate(data) {
+    if (server.getConnectionsCount() >= 4)
+      data.connection.readOnly = true;
 
-    // You can set contextual data to use it in other hooks
+    let user, editors;
+
+    const { token } = data;
+
+    const response = await fetch(`${process.env.APP_ROOT_API}material/getEditors/${data.documentName}`, {
+      headers: {'Content-Type': 'application/json'}
+    });
+    if (response.ok)
+      editors = await response.json();
+
+    jwt.verify(token, process.env.SECRET_TOKEN, (error, decoded) => {
+      if (error) return new Error('Not authorized!');
+
+      if (decoded.editorToken === process.env.EDITOR_TOKEN)
+        user = jwt.decode(decoded.userToken)
+      else return new Error('Not authorized!');
+    });
+
     return {
       user: {
-        id: 1234,
-        name: 'John',
+        id: user.id,
+        name: user.fullname,
       },
+      editors,
     }
   },
   async onStoreDocument(data) {
-    //console.log('onStoreDocument document',data.document)
-    console.log('onStoreDocument documentName',data.documentName)
-    console.log('onStoreDocument context',data.context)
-    const prosemirrorJSON = TiptapTransformer.fromYdoc(data.document);
-    console.log('prosemirrorJSON',prosemirrorJSON)
-    //console.log('onStoreDocument document',data.document)
+    const date = Math.floor(Date.now() / 1000);
+    const snapshot = Y.snapshot(data.document);
+
+    const content = Buffer.from(
+      Y.encodeStateAsUpdate(data.document),
+    ).toString('binary');
+
+    const body = {
+      editingId: data.documentName,
+      userId: data.context.user.id,
+      timestamp: date,
+      content: content,
+      snapshot: Y.encodeSnapshot(snapshot),
+    };
+
+    await fetch(`${process.env.APP_ROOT_API}material/saveMaterialContent`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+
+    if (!(data.context.editors && _.find(data.context.editors, editor => editor.userId === data.context.user.id))) {
+      const response = await fetch(`${process.env.APP_ROOT_API}material/editor/${data.documentName}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          userId: data.context.user.id,
+          timestamp: date,
+        })
+      });
+      if (response.ok) {
+        const editor = await response.json()
+        data.context.editors.push(editor);
+      }
+    }
   },
   async onLoadDocument(data) {
-    console.log('onLoadDocument',)
-    //return loadFromDatabase(data.documentName) || createInitialDocTemplate();
+    const response = await fetch(`${process.env.APP_ROOT_API}material/check-version/${data.documentName}`, {
+      headers: {'Content-Type': 'application/json'},
+    })
+    const dataMaterial = await response.json();
+    if (dataMaterial.version) {
+      const content = JSON.parse(dataMaterial.content);
+
+      Y.applyUpdate(
+        data.document,
+        Buffer.from(content.content, 'binary')
+      );
+      return data.document;
+    }
+
+    return createYjsDoc(emptyDoc);
   },
-  /*extensions: [
-    new Webhook({
-      // [required] url of your application
-      url: 'http://localhost:8000/api/collaborative/test',
-
-      // [required] a random string that will be used to verify the request signature
-      secret: '459824aaffa928e05f5b1caec411ae5f',
-
-      // [required] a transformer for your document
-      transformer: TiptapTransformer,
-
-      // [optional] array of events that will trigger a webhook
-      // defaults to [ Events.onChange ]
-      events: [Events.onConnect, Events.onCreate, Events.onChange, Events.onDisconnect],
-
-      // [optional] time in ms the change event should be debounced,
-      // defaults to 2000
-      debounce: 2000,
-
-      // [optional] time in ms after that the webhook will be sent
-      // regardless of the configured debouncing, defaults to 10000
-      debounceMaxWait: 10000,
-    }),
-  ]*/
 });
 
 const { app } = expressWebsockets(express());
-
-app.get("/", (request, response) => {
-  response.send("Hello World!");
-});
-
-app.post("/test", (request, response) => {
-});
 
 app.ws("/collaboration", (websocket, request) => {
   const context = {
@@ -87,16 +117,10 @@ app.ws("/collaboration", (websocket, request) => {
 
 app.listen(1234, () => console.log("Listening on http://127.0.0.1:1234"));
 
-
-function createInitialDocTemplate(json) {
-  const ydoc = TiptapTransformer.toYdoc(
-    // the actual JSON
+function createYjsDoc(json) {
+  return TiptapTransformer.toYdoc(
     json,
-    // the `field` you’re using in Tiptap. If you don’t know what that is, use 'default'.
     "default",
-    // The Tiptap extensions you’re using. Those are important to create a valid schema.
     Extensions
   );
-  console.log('ydoc',ydoc)
-  return ydoc;
 }

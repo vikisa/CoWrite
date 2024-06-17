@@ -7,7 +7,7 @@
           :key="index"
           @click="selectItem(index)"
       >
-        {{ item.name }}
+        {{ item.userFullName }}
       </el-button>
     </template>
     <div class="item" v-else>
@@ -67,7 +67,7 @@ export default {
       const item = this.items[index]
 
       if (item)
-        this.command({ id: item.id, label: item.name })
+        this.command({ id: item.userId, label: item.userFullName })
     },
   },
 }

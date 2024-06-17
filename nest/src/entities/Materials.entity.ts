@@ -1,7 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn, Unique, OneToOne, JoinColumn, ManyToOne, ManyToMany} from "typeorm";
-import {Length} from "class-validator";
-import {Users} from "./Users.entity";
-import {UserRoles} from "./UserRoles.entity";
+import { Column, Entity, PrimaryGeneratedColumn, Unique, JoinColumn, ManyToOne } from 'typeorm';
+import { Users } from './Users.entity';
 
 @Entity('materials', { schema: 'public' })
 @Unique(['id'])
@@ -13,12 +11,12 @@ export class Materials {
 
   @Column('integer', {
     name: 'm_create_date',
-    nullable: true
+    nullable: true,
   })
   createDate: number;
 
   @Column('integer', {
-    name: 'm_save_date'
+    name: 'm_save_date',
   })
   saveDate: number;
 
@@ -40,7 +38,7 @@ export class Materials {
   })
   creatorId: number;
 
-  @ManyToMany((type) => Users, (u) => u.id)
+  @ManyToOne(() => Users, (u) => u.id)
   @JoinColumn({
     name: 'm_creator_id',
     referencedColumnName: 'id',

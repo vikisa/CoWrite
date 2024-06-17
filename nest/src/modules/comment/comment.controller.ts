@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, Request} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Request } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
@@ -18,6 +18,8 @@ export class CommentController {
   async getCommentsByMaterialId(@Request() req, @Param('id') id: string) {
     const result = [];
     const keys: string[] = await this.redis.keys(`*material:comments-${id}-*`);
+
+    if (keys && !keys.length) return [];
 
     await this.redis.mget(keys).then(async (values) => {
       for (let i = 0; i < keys.length; i++) {
@@ -64,10 +66,6 @@ export class CommentController {
 
   async getComment(editingId, blockId, userId, timestamp, commentText) {
     const user = await this.commentService.getUserById(userId);
-    const lastname = [...user.lastname];
-    lastname[0] = lastname[0].toUpperCase();
-    const firstname = [...user.firstname];
-    firstname[0] = firstname[0].toUpperCase();
 
     return {
       editingId: editingId,
@@ -77,7 +75,7 @@ export class CommentController {
       text: JSON.parse(commentText),
       userData: {
         id: userId,
-        name: `${lastname.join('')} ${firstname.join('')}`,
+        name: `${user.lastname} ${user.firstname}`,
       },
     };
   }

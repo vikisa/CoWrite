@@ -15,10 +15,7 @@ import { JwtModule } from '@nestjs/jwt';
   providers: [AuthService, ConfigService],
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([
-      Users,
-      UserRoles
-    ]),
+    TypeOrmModule.forFeature([Users, UserRoles]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,7 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
           expiresIn: config.get('jwt.expiresIn'),
         },
       }),
-    })
+    }),
   ],
   exports: [AuthService, ConfigService],
 })

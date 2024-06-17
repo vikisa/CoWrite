@@ -6,11 +6,12 @@ const state = {
 };
 
 const getters = {
-  showNotification: (state, getters) => (message, type, duration, additionalProperty) => {
+  showNotification: (state) => (message, type, duration, additionalProperty) => {
     const options = {
       message: message,
       type: type || state.type,
       duration: duration ?? state.duration,
+      offset: 50
     }
     ElNotification(Object.assign(options, additionalProperty))
   },

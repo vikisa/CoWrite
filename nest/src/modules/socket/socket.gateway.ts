@@ -27,4 +27,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async addComment(editingId: string, payload: object) {
     this.server.emit('new-comment', { editingId, ...payload });
   }
+
+  @SubscribeMessage('changeHeader')
+  async changeHeader(editingId: string, header: string) {
+    this.server.emit('change-header', { editingId, header });
+  }
+
+  @SubscribeMessage('addEditor')
+  async addEditor(editingId: string, editor: object) {
+    this.server.emit('add-editor', { editingId, editor });
+  }
 }

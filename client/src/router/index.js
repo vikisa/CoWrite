@@ -41,12 +41,12 @@ const router = createRouter({
         {
           path: 'edit/:editingId',
           name: 'edit-material',
-          component: () => import('@/views/material/IndexCollab.vue'),
+          component: () => import('@/views/material/CollabEditor.vue'),
         },
         {
           path: 'new',
           name: 'new-material',
-          component: () => import('@/views/material/IndexCollab.vue'),
+          component: () => import('@/views/material/CollabEditor.vue'),
         }
       ]
     },
