@@ -40,7 +40,7 @@ const actions = {
     await router.push('/login');
   },
   async getEditorToken({ state, commit }) {
-    const response = await fetch(`${process.env.APP_ROOT_API}auth/editor-token`, {
+    const response = await fetch(`${process.env.APP_ROOT_API}auth/editorToken`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       credentials: 'include',

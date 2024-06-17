@@ -11,9 +11,9 @@ import { UsersToMaterials } from './entities/UsersToMaterials.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { MaterialModule } from './modules/material/material.module';
 import { SocketModule } from './modules/socket/socket.module';
-import { CollabModule } from './modules/collab/collab.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { CommentModule } from './modules/comment/comment.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -48,8 +48,8 @@ import { CommentModule } from './modules/comment/comment.module';
     AuthModule,
     MaterialModule,
     SocketModule,
-    CollabModule,
     CommentModule,
+    UserModule,
   ],
 })
 export class AppModule {}

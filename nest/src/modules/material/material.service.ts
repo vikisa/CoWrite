@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Materials } from '../../entities/Materials.entity';
 import { UsersToMaterials } from '../../entities/UsersToMaterials.entity';
+import { DEFAULT_MATERIAL_RELATION } from '../../constants/material';
 
 @Injectable()
 export class MaterialService {
@@ -20,26 +21,22 @@ export class MaterialService {
   async getOrCreate(data) {
     try {
       return {
-        material: await this.getMaterialByEditing(data.editingId),
+        material: await this.getMaterialByEditingId(data.editingId),
         message: 'Материал открыт',
       };
     } catch (e) {
       await this.createMaterial(data);
       return {
-        material: await this.getMaterialByEditing(data.editingId),
+        material: await this.getMaterialByEditingId(data.editingId),
         message: 'Материал создан',
       };
     }
   }
 
-  async getMaterialByEditing(id) {
+  async getMaterialByEditingId(id) {
     const materialId: string = id;
-    const material = await this.materialRepository.findOne({
-      where: [
-        {
-          editingId: materialId,
-        },
-      ],
+    const material = await this.findMaterial({
+      editingId: materialId,
     });
 
     if (!material) throw new NotFoundException('material not found');
@@ -58,13 +55,7 @@ export class MaterialService {
   }
 
   async setHeader(editingId, header) {
-    const material = await this.materialRepository.findOne({
-      where: [
-        {
-          editingId: editingId,
-        },
-      ],
-    });
+    const material = await this.findMaterial({ editingId: editingId });
     const id = material.id;
     delete material.id;
     material.header = header;
@@ -73,14 +64,7 @@ export class MaterialService {
   }
 
   async getEditors(editingId) {
-    const material = await this.materialRepository.findOne({
-      select: ['id'],
-      where: [
-        {
-          editingId: editingId,
-        },
-      ],
-    });
+    const material = await this.findMaterial({ editingId: editingId }, ['id']);
     if (!material) return [];
 
     const id = material.id;
@@ -95,14 +79,7 @@ export class MaterialService {
   }
 
   async addEditorToMaterial(editingId, userId, timestamp) {
-    const material = await this.materialRepository.findOne({
-      select: ['id'],
-      where: [
-        {
-          editingId: editingId,
-        },
-      ],
-    });
+    const material = await this.findMaterial({ editingId: editingId }, ['id']);
     if (!material) return;
     const materialId = material.id;
 
@@ -119,6 +96,15 @@ export class MaterialService {
         },
       ],
       relations: ['user'],
+    });
+  }
+
+  async findMaterial(condition: any, columns?) {
+    const select = columns ? columns : DEFAULT_MATERIAL_RELATION;
+
+    return await this.materialRepository.findOne({
+      select: select,
+      where: condition,
     });
   }
 }

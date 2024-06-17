@@ -13,8 +13,8 @@ import { Length } from 'class-validator';
 import { UserRoles } from './UserRoles.entity';
 
 @Entity('users', { schema: 'public' })
-@Unique('uq_users_id',['id'])
-@Unique('uq_users_username',['username'])
+@Unique('uq_users_id', ['id'])
+@Unique('uq_users_username', ['username'])
 @Unique('uq_users_email', ['email'])
 export class Users {
   @PrimaryGeneratedColumn({
@@ -40,6 +40,7 @@ export class Users {
   @Column('varchar', {
     name: 'u_email',
     length: 255,
+    select: false,
   })
   @Length(0, 255)
   email: string;
@@ -66,7 +67,7 @@ export class Users {
   })
   role: number | null;
 
-  @ManyToOne((type) => UserRoles, (ur) => ur.id)
+  @ManyToOne(() => UserRoles, (ur) => ur.id)
   @JoinColumn({
     name: 'u_role',
     referencedColumnName: 'id',
@@ -75,15 +76,16 @@ export class Users {
 
   @AfterLoad()
   setComputed() {
-    const lastname = [...this.lastname];
-    lastname[0] = lastname[0].toUpperCase();
-    this.lastname = lastname.join('');
+    /*if (this.lastname) {
+      const lastname = [...this.lastname];
+      lastname[0] = lastname[0]?.toUpperCase();
+      this.lastname = lastname.join('');
+    }
 
-    const firstname = [...this.firstname];
-    firstname[0] = firstname[0].toUpperCase();
-    this.firstname = firstname.join('');
-
-    //delete this.u_lastname;
-    //delete this.u_firstname;
+    if (this.firstname) {
+      const firstname = [...this.firstname];
+      firstname[0] = firstname[0]?.toUpperCase();
+      this.firstname = firstname.join('');
+    }*/
   }
 }

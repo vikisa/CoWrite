@@ -84,7 +84,7 @@ const server = new Hocuspocus({
     }
   },
   async onLoadDocument(data) {
-    const response = await fetch(`${process.env.APP_ROOT_API}material/check-version/${data.documentName}`, {
+    const response = await fetch(`${process.env.APP_ROOT_API}material/checkVersion/${data.documentName}`, {
       headers: {'Content-Type': 'application/json'},
     })
     const dataMaterial = await response.json();

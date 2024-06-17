@@ -9,11 +9,8 @@ const getters = {
 
 const actions = {
   async getUserData({ commit, dispatch, state, rootGetters }, token){
-    const response = await fetch(`${process.env.APP_ROOT_API}auth/user`, {
-      method: 'POST',
+    const response = await fetch(`${process.env.APP_ROOT_API}auth/user/${token}`, {
       headers: {'Content-Type': 'application/json'},
-      credentials: 'include',
-      body: JSON.stringify({ token })
     });
 
     if (response.ok) {

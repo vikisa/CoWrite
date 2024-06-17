@@ -95,7 +95,7 @@ export default {
     }
   },
   async mounted() {
-    const response = await fetch(`${process.env.APP_ROOT_API}auth/roles`, {
+    const response = await fetch(`${process.env.APP_ROOT_API}user/roles`, {
       method: 'GET',
       headers: {'Content-Type': 'application/json'}
     });
