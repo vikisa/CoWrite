@@ -32,6 +32,7 @@ export class Users {
   @Column('varchar', {
     name: 'u_password',
     length: 100,
+    select: false,
   })
   @Length(0, 100)
   password: string;

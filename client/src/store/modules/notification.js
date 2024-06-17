@@ -11,6 +11,7 @@ const getters = {
       message: message,
       type: type || state.type,
       duration: duration ?? state.duration,
+      offset: 50
     }
     ElNotification(Object.assign(options, additionalProperty))
   },

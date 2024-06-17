@@ -20,7 +20,7 @@ export class AuthController {
       filterAuthDto;
     const hashedPassword = await bcrypt.hash(password, 5);
 
-    const user = await this.authService.register({
+    return await this.authService.register({
       username,
       password: hashedPassword,
       email,
@@ -28,9 +28,6 @@ export class AuthController {
       lastname,
       role,
     });
-    delete user.password;
-
-    return user;
   }
 
   @Post('login')
@@ -38,7 +35,6 @@ export class AuthController {
     @Body('username') username: string,
     @Body('password') password: string,
   ) {
-    console.log(username, password)
     return await this.authService.login(username, password);
   }
 
@@ -46,7 +42,6 @@ export class AuthController {
   async user(@Body('token') token: string) {
     try {
       const data = await this.jwtService.verifyAsync(token);
-      console.log('data',data)
 
       if (!data) {
         throw new UnauthorizedException('User not authorized');
@@ -69,7 +64,7 @@ export class AuthController {
   @Post('editor-token')
   async getEditorToken(@Body('token') token: string) {
     const data = await this.jwtService.verifyAsync(token);
-    console.log('data editor token',data,token)
+
     if (!data) {
       throw new UnauthorizedException('User not authorized');
     }

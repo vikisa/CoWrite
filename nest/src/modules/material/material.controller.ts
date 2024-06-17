@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Param, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Request, Patch } from '@nestjs/common';
 import { MaterialService } from './material.service';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Controller('api/material')
 export class MaterialController {
   constructor(
     private materialService: MaterialService,
     @InjectRedis() private readonly redis: Redis,
+    private readonly socket: SocketGateway,
   ) {}
 
   @Post('create')
@@ -105,5 +107,36 @@ export class MaterialController {
       `material:snapshot-${editingId}-${version + 1}`,
       JSON.stringify(snapshotData),
     );
+  }
+
+  @Patch('saveHeader/:id')
+  async saveHeader(
+    @Request() req,
+    @Param('id') id: string,
+    @Body('header') header: string,
+  ) {
+    await this.socket.changeHeader(id, header);
+    return await this.materialService.setHeader(id, header);
+  }
+
+  @Get('getEditors/:editingId')
+  async getEditors(@Request() req, @Param('editingId') editingId: string) {
+    return await this.materialService.getEditors(editingId);
+  }
+
+  @Post('editor/:editingId')
+  async addEditor(
+    @Request() req,
+    @Param('editingId') editingId: string,
+    @Body('userId') userId: number,
+    @Body('timestamp') timestamp: number,
+  ) {
+    const editor = await this.materialService.addEditorToMaterial(
+      editingId,
+      userId,
+      timestamp,
+    );
+    await this.socket.addEditor(editingId, editor);
+    return editor;
   }
 }

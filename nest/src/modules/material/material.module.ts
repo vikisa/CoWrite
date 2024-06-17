@@ -4,7 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MaterialController } from './material.controller';
 import { MaterialService } from './material.service';
 
-import { Materials } from "../../entities/Materials.entity";
+import { Materials } from '../../entities/Materials.entity';
+import { UsersToMaterials } from '../../entities/UsersToMaterials.entity';
+import { SocketModule } from '../socket/socket.module';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -15,7 +17,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule,
     TypeOrmModule.forFeature([
       Materials,
+      UsersToMaterials
     ]),
+    SocketModule
   ],
   exports: [MaterialService, ConfigService],
 })

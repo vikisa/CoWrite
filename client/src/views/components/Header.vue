@@ -26,12 +26,46 @@ export default {
   align-items: center;
   justify-content: space-between;
 
-  &:deep(.editor-info-container) {
-    padding: 0px 20px;
+  &:deep(.material-header) {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+
+    .el-divider {
+      height: unset;
+    }
   }
-}
 
-.editor-info-container {
+  &:deep(.editors-info) {
+    margin-right: 20px;
+  }
 
+  &:deep(.editor-info-container) {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 0 20px;
+
+    .editor-name {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      font-weight: bold;
+
+      i {
+        font-size: 11px;
+        color: #E6A23C;
+
+        &.connected {
+          color: #67C23A;
+        }
+      }
+    }
+
+    .editor-mode {
+      opacity: 0.6;
+      font-size: 12px;
+    }
+  }
 }
 </style>

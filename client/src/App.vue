@@ -42,7 +42,7 @@
       <el-main>
         <el-row justify="center" style="height: 100%">
           <el-col :span="22">
-            <router-view />
+            <router-view :key="$route.fullPath"/>
           </el-col>
         </el-row>
       </el-main>
@@ -87,6 +87,10 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .main-container, .el-aside, .menu {
   min-height: 100vh;
+}
+
+.menu, .main-container {
+  max-height: 100vh;
 }
 
 .el-main {

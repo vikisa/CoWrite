@@ -10,15 +10,25 @@ import { Extensions } from "./extensions/index.js";
 import dotenv from 'dotenv'
 dotenv.config();
 import fetch from "node-fetch";
+import _ from 'lodash';
 
 const emptyDoc = {"type":"doc","content":[{"type":"editorBlock","attrs":{"blockId":"b5e4133a74","number":0},"content":[{"type":"paragraph"}]}]};
 
 const server = new Hocuspocus({
   port: 1234,
   async onAuthenticate(data) {
-    let user;
+    if (server.getConnectionsCount() >= 4)
+      data.connection.readOnly = true;
+
+    let user, editors;
 
     const { token } = data;
+
+    const response = await fetch(`${process.env.APP_ROOT_API}material/getEditors/${data.documentName}`, {
+      headers: {'Content-Type': 'application/json'}
+    });
+    if (response.ok)
+      editors = await response.json();
 
     jwt.verify(token, process.env.SECRET_TOKEN, (error, decoded) => {
       if (error) return new Error('Not authorized!');
@@ -26,16 +36,18 @@ const server = new Hocuspocus({
       if (decoded.editorToken === process.env.EDITOR_TOKEN)
         user = jwt.decode(decoded.userToken)
       else return new Error('Not authorized!');
-    })
+    });
 
     return {
       user: {
         id: user.id,
         name: user.fullname,
       },
+      editors,
     }
   },
   async onStoreDocument(data) {
+    const date = Math.floor(Date.now() / 1000);
     const snapshot = Y.snapshot(data.document);
 
     const content = Buffer.from(
@@ -45,7 +57,7 @@ const server = new Hocuspocus({
     const body = {
       editingId: data.documentName,
       userId: data.context.user.id,
-      timestamp: Math.floor(Date.now() / 1000),
+      timestamp: date,
       content: content,
       snapshot: Y.encodeSnapshot(snapshot),
     };
@@ -55,6 +67,21 @@ const server = new Hocuspocus({
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body)
     });
+
+    if (!(data.context.editors && _.find(data.context.editors, editor => editor.userId === data.context.user.id))) {
+      const response = await fetch(`${process.env.APP_ROOT_API}material/editor/${data.documentName}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          userId: data.context.user.id,
+          timestamp: date,
+        })
+      });
+      if (response.ok) {
+        const editor = await response.json()
+        data.context.editors.push(editor);
+      }
+    }
   },
   async onLoadDocument(data) {
     const response = await fetch(`${process.env.APP_ROOT_API}material/check-version/${data.documentName}`, {
@@ -76,13 +103,6 @@ const server = new Hocuspocus({
 });
 
 const { app } = expressWebsockets(express());
-
-app.get("/", (request, response) => {
-  response.send("Hello World!");
-});
-
-app.post("/test", (request, response) => {
-});
 
 app.ws("/collaboration", (websocket, request) => {
   const context = {
