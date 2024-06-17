@@ -36,6 +36,9 @@ import { UserModule } from './modules/user/user.module';
       }),
     }),
     RedisModule.forRootAsync({
+      imports: undefined,
+      useClass: undefined,
+      useExisting: undefined,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         config: {
