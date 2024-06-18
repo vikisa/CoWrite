@@ -1,23 +1,30 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Request } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import { SocketGateway } from '../socket/socket.gateway';
+import { UserService } from '../user/user.service';
 
 @Controller('api/comment')
 export class CommentController {
   constructor(
     private readonly commentService: CommentService,
+    private readonly userService: UserService,
     @InjectRedis() private readonly redis: Redis,
     private config: ConfigService,
     private readonly socket: SocketGateway,
   ) {}
 
-  @Get(':id')
-  async getCommentsByMaterialId(@Request() req, @Param('id') id: string) {
+  @Get(':editingId')
+  async getCommentsByEditingId(
+    @Request() req,
+    @Param('editingId') editingId: string,
+  ) {
     const result = [];
-    const keys: string[] = await this.redis.keys(`*material:comments-${id}-*`);
+    const keys: string[] = await this.redis.keys(
+      `*material:comments-${editingId}-*`,
+    );
 
     if (keys && !keys.length) return [];
 
@@ -30,7 +37,7 @@ export class CommentController {
         if (values[i]) {
           result.push(
             await this.getComment(
-              id,
+              editingId,
               keyValues[2],
               Number(keyValues[3]),
               Number(keyValues[4]),
@@ -65,7 +72,10 @@ export class CommentController {
   }
 
   async getComment(editingId, blockId, userId, timestamp, commentText) {
-    const user = await this.commentService.getUserById(userId);
+    const user = await this.userService.findUser({ id: Number(userId) }, [
+      'firstname',
+      'lastname',
+    ]);
 
     return {
       editingId: editingId,

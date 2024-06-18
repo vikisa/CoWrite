@@ -17,6 +17,7 @@ export class Materials {
 
   @Column('integer', {
     name: 'm_save_date',
+    default: 0,
   })
   saveDate: number;
 

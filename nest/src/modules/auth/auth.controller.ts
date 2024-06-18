@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, UnauthorizedException } from '@nestjs/common';
+import {Controller, Get, Post, Body, UnauthorizedException, Request, Param} from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { FilterAuthDto } from './dto/filter-auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from '../user/user.service';
 
 @Controller('api/auth')
 export class AuthController {
@@ -12,6 +13,7 @@ export class AuthController {
     private authService: AuthService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private userService: UserService,
   ) {}
 
   @Post('register')
@@ -38,8 +40,8 @@ export class AuthController {
     return await this.authService.login(username, password);
   }
 
-  @Post('user')
-  async user(@Body('token') token: string) {
+  @Get('user/:token')
+  async user(@Request() req, @Param('token') token: string) {
     try {
       const data = await this.jwtService.verifyAsync(token);
 
@@ -47,21 +49,18 @@ export class AuthController {
         throw new UnauthorizedException('User not authorized');
       }
 
-      const user = await this.authService.findOne({ id: data['id'] });
-      const { password, ...result } = user;
-
-      return result;
+      return await this.userService.findUser({ id: data['id'] }, [
+        'id',
+        'username',
+        'firstname',
+        'lastname',
+      ]);
     } catch (e) {
       throw new UnauthorizedException('User not authorized');
     }
   }
 
-  @Get('roles')
-  async roles() {
-    return await this.authService.getRoles();
-  }
-
-  @Post('editor-token')
+  @Post('editorToken')
   async getEditorToken(@Body('token') token: string) {
     const data = await this.jwtService.verifyAsync(token);
 
@@ -69,7 +68,7 @@ export class AuthController {
       throw new UnauthorizedException('User not authorized');
     }
 
-    const user = await this.authService.findOne({ id: data['id'] });
+    const user = await this.userService.findUser({ id: data['id'] });
     const userPayload = {
       id: user.id,
       fullname: `${user.lastname} ${user.firstname}`,

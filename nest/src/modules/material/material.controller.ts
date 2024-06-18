@@ -3,6 +3,8 @@ import { MaterialService } from './material.service';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { SocketGateway } from '../socket/socket.gateway';
+import { CreateMaterialDto } from './dto/create-material.dto';
+import { SaveContentDto } from './dto/save-content.dto';
 
 @Controller('api/material')
 export class MaterialController {
@@ -12,76 +14,40 @@ export class MaterialController {
     private readonly socket: SocketGateway,
   ) {}
 
-  @Post('create')
-  async createMaterial(
-    @Body('createDate') createDate: string,
-    @Body('saveDate') saveDate: string,
-    @Body('text') text: string,
-    @Body('header') header: string,
-    @Body('creatorId') creatorId: string,
-    @Body('editingId') editingId: string,
-  ) {
-    return await this.materialService.createMaterial({
-      createDate,
-      saveDate,
-      text,
-      header,
-      creatorId,
-      editingId,
-    });
+  @Post('getOrCreate')
+  async getOrCreate(@Body() createMaterialDto: CreateMaterialDto) {
+    return this.materialService.getOrCreate(createMaterialDto);
   }
 
-  @Get('get')
+  @Get('getList')
   async getMaterials() {
     return this.materialService.getMaterials();
   }
 
-  @Get(':id')
-  async getMaterialsById(@Request() req, @Param('id') id: string) {
-    return this.materialService.getMaterialByEditing(id);
+  @Get(':editingId')
+  async getMaterialsById(
+    @Request() req,
+    @Param('editingId') editingId: string,
+  ) {
+    return this.materialService.getMaterialByEditingId(editingId);
   }
 
-  @Get('check-version/:id')
-  async getLastVersion(@Request() req, @Param('id') id: string) {
-    const version = await this.redis.get(`material:version-${id}`);
+  @Get('checkVersion/:editingId')
+  async getLastVersion(@Request() req, @Param('editingId') editingId: string) {
+    const version = await this.redis.get(`material:version-${editingId}`);
     let content;
     if (version)
-      content = await this.redis.get(`material:content-${id}-${version}`);
-
-    console.log({ version, content });
+      content = await this.redis.get(
+        `material:content-${editingId}-${version}`,
+      );
 
     return { version, content };
   }
 
-  @Post('getOrCreate')
-  async getOrCreate(
-    @Body('createDate') createDate: string,
-    @Body('saveDate') saveDate: string,
-    @Body('text') text: string,
-    @Body('header') header: string,
-    @Body('creatorId') creatorId: string,
-    @Body('editingId') editingId: string,
-  ) {
-    const material = {
-      createDate,
-      saveDate,
-      text,
-      header,
-      creatorId,
-      editingId,
-    };
-
-    return this.materialService.getOrCreate(material);
-  }
-
   @Post('saveMaterialContent')
-  async saveMaterialContent(
-    @Body('editingId') editingId: string,
-    @Body('userId') userId: number,
-    @Body('content') content: string,
-    @Body('snapshot') snapshot: string,
-    @Body('timestamp') timestamp: string,
-  ) {
+  async saveMaterialContent(@Body() saveContentDto: SaveContentDto) {
+    const { editingId, userId, timestamp, content, snapshot } = saveContentDto;
+
     const checkVersion = await this.redis.get(`material:version-${editingId}`);
     const version = checkVersion ? Number(checkVersion) : 0;
 
@@ -109,14 +75,14 @@ export class MaterialController {
     );
   }
 
-  @Patch('saveHeader/:id')
+  @Patch('saveHeader/:editingId')
   async saveHeader(
     @Request() req,
-    @Param('id') id: string,
+    @Param('editingId') editingId: string,
     @Body('header') header: string,
   ) {
-    await this.socket.changeHeader(id, header);
-    return await this.materialService.setHeader(id, header);
+    await this.socket.changeHeader(editingId, header);
+    return await this.materialService.setHeader(editingId, header);
   }
 
   @Get('getEditors/:editingId')

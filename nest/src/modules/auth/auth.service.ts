@@ -1,11 +1,12 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
-import { Not, Repository } from 'typeorm';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from '../../entities/Users.entity';
 import { UserRoles } from '../../entities/UserRoles.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private readonly userRolesRepository: Repository<UserRoles>,
     private configService: ConfigService,
     private jwtService: JwtService,
+    private userService: UserService,
   ) {}
 
   async register(data: any) {
@@ -23,18 +25,12 @@ export class AuthService {
   }
 
   async login(username: string, password: string) {
-    const user = await this.userRepository.findOne({
-      select: [
-        'id',
-        'username',
-        'password',
-        'email',
-        'firstname',
-        'lastname',
-        'role',
-      ],
-      where: { username: username },
-    });
+    const user = await this.userService.findUser({ username: username }, [
+      'id',
+      'username',
+      'password',
+      'email',
+    ]);
 
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -51,21 +47,5 @@ export class AuthService {
     };
 
     return this.jwtService.sign(tokenData);
-  }
-
-  async findOne(condition: any) {
-    return await this.userRepository.findOne({
-      where: condition,
-      relations: ['roles'],
-    });
-  }
-
-  async getRoles() {
-    const roles = await this.userRolesRepository.find({
-      where: { id: Not(1) },
-    });
-    if (!roles) throw new NotFoundException('Роли не найдены');
-
-    return roles;
   }
 }
